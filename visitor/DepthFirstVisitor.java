@@ -390,9 +390,11 @@ public class DepthFirstVisitor implements Visitor {
     * f2 -> PrimaryExpression()
     */
    public void visit(PlusExpression n) {
+      
       n.f0.accept(this);
       n.f1.accept(this);
       n.f2.accept(this);
+
    }
 
    /**
