@@ -36,4 +36,3 @@ public class NotExpression implements Node {
       v.visit(this,argu);
    }
 }
-

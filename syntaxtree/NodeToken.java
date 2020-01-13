@@ -10,6 +10,7 @@ import java.util.*;
  * is used, also contains a Vector of preceding special tokens.
  */
 public class NodeToken implements Node {
+   public String choice_num = "2";
    public NodeToken(String s) {
       this(s, -1, -1, -1, -1, -1);    }
 
@@ -63,10 +64,10 @@ public class NodeToken implements Node {
       v.visit(this);
    }
    public <R,A> R accept(visitor.GJVisitor<R,A> v, A argu) {
-      return v.visit(this,argu);
+      return choice_num;
    }
    public <R> R accept(visitor.GJNoArguVisitor<R> v) {
-      return v.visit(this);
+      return choice_num;
    }
    public <A> void accept(visitor.GJVoidVisitor<A> v, A argu) {
       v.visit(this,argu);
@@ -84,4 +85,3 @@ public class NodeToken implements Node {
    // -1 if not available.
    public int kind;
 }
-

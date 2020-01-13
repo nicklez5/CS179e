@@ -1,6 +1,7 @@
 Stringimport syntaxtree.*;
 import visitor.*;
 import java.util.*;
+import static packagename.Constants.*;
 
 public class TypeCheck implements GJVisitor<String, Int> {
 
@@ -127,102 +128,249 @@ public class TypeCheck implements GJVisitor<String, Int> {
 	}
 
 	public String visit(BooleanType n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
-		 return _ret;
+		String _ret = "FALSE";
+		boolean check_first = false;
+
+		if((n.f0.accept(this, argu)).equals(NODE_TOKEN)){
+			check_first = true;
+		}
+		if(check_first){
+			_ret = "TRUE";
+		}
+		return _ret;
 	}
 
 	public String visit(IntegerType n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
+		 String _ret = "FALSE";
+		 boolean check_first = false;
+
+		 if((n.f0.accept(this, argu)).equals(NODE_TOKEN)){
+			 check_first = true;
+		 }
+		 if(check_first){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 
 	public String visit(Statement n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
+		 String _ret = "FALSE";
+		 boolean check_first = false;
+
+		 if((n.f0.accept(this, argu)).equals(STATEMENT_TOKEN)){
+			 check_first = true;
+		 }
+		 if(check_first){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 
 	public String visit(Block n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
+		 String _ret = "FALSE";
+		 boolean check_first = false;
+		 boolean check_third = false;
+
+		 if((n.f0.accept(this, argu)).equals(NODE_TOKEN)){
+			 check_first = true;
+		 }
 		 n.f1.accept(this, argu);
-		 n.f2.accept(this, argu);
+
+		 if((n.f2.accept(this, argu)).equals(NODE_TOKEN)){
+			 check_third = true;
+		 }
+
+		 if(check_first && check_third){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 
 	public String visit(AssignmentStatement n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
+		 String _ret = "FALSE";
+		 boolean check_first = false;
+		 boolean check_second = false;
+
+		 if((n.f0.accept(this, argu)).equals(ID_TOKEN)){
+			 check_first = true;
+		 }
 		 n.f1.accept(this, argu);
-		 n.f2.accept(this, argu);
+
+		 if((n.f2.accept(this, argu)).equals(EXP_TOKEN)){
+			 check_second = true;
+		 }
 		 n.f3.accept(this, argu);
+		 if(check_first && check_second){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 
 	public String visit(ArrayAssignmentStatement n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
+		 String _ret = "FALSE";
+
+		 boolean check_first = false;
+		 boolean check_second = false;
+		 boolean check_third = false;
+		 if((n.f0.accept(this, argu)).equals(ID_TOKEN)){
+			 check_first = true;
+		 }
+
 		 n.f1.accept(this, argu);
-		 n.f2.accept(this, argu);
+		 if((n.f2.accept(this, argu)).equals(EXP_TOKEN)){
+			 check_second = true;
+		 }
+
 		 n.f3.accept(this, argu);
 		 n.f4.accept(this, argu);
-		 n.f5.accept(this, argu);
+		 if((n.f5.accept(this, argu)).equals(EXP_TOKEN)){
+			 check_third = true;
+		 }
 		 n.f6.accept(this, argu);
+
+		 if(check_first && check_second && check_third){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 
 	public String visit(IfStatement n, Int argu) {
-		 String _ret=null;
+		 String _ret = "FALSE";
+
+		 boolean check_first = false;
+		 boolean check_second = false;
+		 boolean check_third = false;
+
 		 n.f0.accept(this, argu);
 		 n.f1.accept(this, argu);
-		 n.f2.accept(this, argu);
+
+		 if((n.f2.accept(this, argu)).equals(EXP_TOKEN)){
+			 check_first = true;
+		 }
 		 n.f3.accept(this, argu);
-		 n.f4.accept(this, argu);
+
+		 if((n.f4.accept(this, argu)).equals(STATEMENT_TOKEN)){
+			 check_second = true;
+		 }
+
 		 n.f5.accept(this, argu);
-		 n.f6.accept(this, argu);
+
+		 if((n.f6.accept(this, argu)).equals(STATEMENT_TOKEN)){
+			 check_third = true;
+		 }
+		 if(check_first && check_second && check_third){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 
 	public String visit(WhileStatement n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
-		 n.f1.accept(this, argu);
-		 n.f2.accept(this, argu);
-		 n.f3.accept(this, argu);
-		 n.f4.accept(this, argu);
+		String _ret = "FALSE";
+
+		boolean check_third = false;
+		boolean check_fifth = false;
+
+		n.f0.accept(this, argu);
+		n.f1.accept(this, argu);
+
+		if((n.f2.accept(this, argu)).equals(EXP_TOKEN)){
+			check_third = true;
+		}
+		n.f3.accept(this, argu);
+
+		if((n.f4.accept(this, argu)).equals(STATEMENT_TOKEN)){
+			check_fifth = true;
+		}
+
+		if(check_third && check_fifth){
+			_ret = "TRUE";
+		}
+
 		 return _ret;
 	}
 
 	public String visit(PrintStatement n, Int argu) {
-		 String _ret=null;
+		 String _ret = "FALSE";
+
+		 boolean check_third = false;
+		 boolean check_fifth = false;
+
 		 n.f0.accept(this, argu);
 		 n.f1.accept(this, argu);
-		 n.f2.accept(this, argu);
+
+		 if((n.f2.accept(this, argu)).equals(EXP_TOKEN)){
+			 check_third = true;
+		 }
 		 n.f3.accept(this, argu);
-		 n.f4.accept(this, argu);
+
+		 if((n.f4.accept(this, argu)).equals(EXP_TOKEN)){
+			 check_fifth = true;
+		 }
+
+		 if(check_third && check_fifth){
+			 _ret = "TRUE";
+		 }
+
 		 return _ret;
 	}
 
 	public String visit(Expression n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
+		 String _ret = "FALSE";
+		 boolean check_first = false;
+
+		 if((n.f0.accept(this, argu)).equals(EXP_TOKEN)){
+			 check_first = true;
+		 }
+		 if(check_first){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 
+
 	public String visit(AndExpression n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
+		 String _ret = "FALSE";
+		 boolean check_first = false;
+		 boolean check_third = false;
+
+		 // RETURNS THE CHOICE NUMBER
+		 if((n.f0.accept(this, argu)).equals(PRIMARY_EXP_TOKEN)){
+			 check_first = true;
+		 }
+
 		 n.f1.accept(this, argu);
-		 n.f2.accept(this, argu);
+
+		 if((n.f2.accept(this, argu)).equals(PRIMARY_EXP_TOKEN)){
+			 check_third = true;
+		 }
+
+		 if(check_first && check_third){
+			 _ret = "TRUE";
+		 }
+
 		 return _ret;
 	}
+
 	public String visit(CompareExpression n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
+		 String _ret = "FALSE";
+
+		 boolean check_first = false;
+		 boolean check_third = false;
+
+		 if((n.f0.accept(this,argu)).equals(PRIMARY_EXP_TOKEN)){
+			 check_first = true;
+		 }
+
 		 n.f1.accept(this, argu);
-		 n.f2.accept(this, argu);
+
+		 if((n.f2.accept(this, argu)).equals(PRIMARY_EXP_TOKEN)){
+			 check_third = true;
+		 }
+
+		 if(check_first && check_third){
+			 _ret = "TRUE";
+		 }
+
 		 return _ret;
 	}
 
@@ -232,11 +380,27 @@ public class TypeCheck implements GJVisitor<String, Int> {
 	 * f2 -> PrimaryExpression()
 	 */
 	public String visit(PlusExpression n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
-		 n.f1.accept(this, argu);
-		 n.f2.accept(this, argu);
-		 return _ret;
+		String _ret = "FALSE";
+
+		boolean check_first = false;
+		boolean check_third = false;
+
+		if((n.f0.accept(this,argu)).equals(PRIMARY_EXP_TOKEN)){
+			check_first = true;
+		}
+
+		n.f1.accept(this, argu);
+
+		if((n.f2.accept(this, argu)).equals(PRIMARY_EXP_TOKEN)){
+			check_third = true;
+		}
+
+		if(check_first && check_third){
+			_ret = "TRUE";
+		}
+
+		return _ret;
+
 	}
 
 	/**
@@ -245,11 +409,26 @@ public class TypeCheck implements GJVisitor<String, Int> {
 	 * f2 -> PrimaryExpression()
 	 */
 	public String visit(MinusExpression n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
-		 n.f1.accept(this, argu);
-		 n.f2.accept(this, argu);
-		 return _ret;
+		String _ret = "FALSE";
+
+	 boolean check_first = false;
+	 boolean check_third = false;
+
+	 if((n.f0.accept(this,argu)).equals(PRIMARY_EXP_TOKEN)){
+		 check_first = true;
+	 }
+
+	 n.f1.accept(this, argu);
+
+	 if((n.f2.accept(this, argu)).equals(PRIMARY_EXP_TOKEN)){
+		 check_third = true;
+	 }
+
+	 if(check_first && check_third){
+		 _ret = "TRUE";
+	 }
+
+	 return _ret;
 	}
 
 	/**
@@ -258,11 +437,26 @@ public class TypeCheck implements GJVisitor<String, Int> {
 	 * f2 -> PrimaryExpression()
 	 */
 	public String visit(TimesExpression n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
-		 n.f1.accept(this, argu);
-		 n.f2.accept(this, argu);
-		 return _ret;
+		String _ret = "FALSE";
+
+	 boolean check_first = false;
+	 boolean check_third = false;
+
+	 if((n.f0.accept(this,argu)).equals(PRIMARY_EXP_TOKEN)){
+		 check_first = true;
+	 }
+
+	 n.f1.accept(this, argu);
+
+	 if((n.f2.accept(this, argu)).equals(PRIMARY_EXP_TOKEN)){
+		 check_third = true;
+	 }
+
+	 if(check_first && check_third){
+		 _ret = "TRUE";
+	 }
+
+	 return _ret;
 	}
 
 	/**
