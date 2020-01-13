@@ -10,5 +10,7 @@ public class Constants{
     public final static String MAIN_CLASS_TOKEN = "8";
     public final static String TYPE_TOKEN = "9";
     public final static String NODE_OPTIONAL_TOKEN = "10";
+    public final static String FORMALPARAMETER_TOKEN = "11";
+    public final static String FORMAL_PARAMETER_REST_TOKEN = "12";
   }
 }

@@ -13,7 +13,7 @@ package syntaxtree;
  */
 public class Type implements Node {
    public NodeChoice f0;
-
+   public String choice_num = "9";
    public Type(NodeChoice n0) {
       f0 = n0;
    }
@@ -22,13 +22,14 @@ public class Type implements Node {
       v.visit(this);
    }
    public <R,A> R accept(visitor.GJVisitor<R,A> v, A argu) {
-      return v.visit(this,argu);
+      return choice_num;
+      //return v.visit(this,argu);
    }
    public <R> R accept(visitor.GJNoArguVisitor<R> v) {
-      return v.visit(this);
+      return choice_num;
+      //return v.visit(this);
    }
    public <A> void accept(visitor.GJVoidVisitor<A> v, A argu) {
       v.visit(this,argu);
    }
 }
-

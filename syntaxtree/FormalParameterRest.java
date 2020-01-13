@@ -12,7 +12,7 @@ package syntaxtree;
 public class FormalParameterRest implements Node {
    public NodeToken f0;
    public FormalParameter f1;
-
+   public String choice_num = "12";
    public FormalParameterRest(NodeToken n0, FormalParameter n1) {
       f0 = n0;
       f1 = n1;
@@ -27,13 +27,14 @@ public class FormalParameterRest implements Node {
       v.visit(this);
    }
    public <R,A> R accept(visitor.GJVisitor<R,A> v, A argu) {
-      return v.visit(this,argu);
+      return choice_num;
+      //return v.visit(this,argu);
    }
    public <R> R accept(visitor.GJNoArguVisitor<R> v) {
-      return v.visit(this);
+      return choice_num;
+      //return v.visit(this);
    }
    public <A> void accept(visitor.GJVoidVisitor<A> v, A argu) {
       v.visit(this,argu);
    }
 }
-

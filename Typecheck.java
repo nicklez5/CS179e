@@ -14,26 +14,40 @@ public class TypeCheck implements GJVisitor<String, Int> {
 	}
 
 	public String visit(MainClass n, Int argu){
-		String _ret = null;
+		String _ret = "FALSE";
+		boolean check_first = false;
+		boolean check_sec = false;
+		boolean chek_third = false;
 		n.f0.accept(this, argu);
-		n.f0.accept(this, argu);
-		n.f1.accept(this, argu);
+		if((n.f1.accept(this,argu)).equals(ID_TOKEN)){
+			check_first = true;
+		}
+
 		n.f2.accept(this, argu);
 		n.f3.accept(this, argu);
 		n.f4.accept(this, argu);
 		n.f5.accept(this, argu);
 		n.f6.accept(this, argu);
+		if((n.f11.accept(this, argu)).equals(ID_TOKEN)){
+			check_sec = true;
+		}
 		n.f7.accept(this, argu);
 		n.f8.accept(this, argu);
 		n.f9.accept(this, argu);
 		n.f10.accept(this, argu);
-		n.f11.accept(this, argu);
 		n.f12.accept(this, argu);
 		n.f13.accept(this, argu);
 		n.f14.accept(this, argu);
-		n.f15.accept(this, argu);
+
+		if((n.f15.accept(this,argu)).equals(NODE_LIST_OPTIONAL_TOKEN)){
+			check_third = true;
+		}
 		n.f16.accept(this, argu);
 		n.f17.accept(this, argu);
+
+		if(check_first && check_sec && check_third){
+			_ret = "TRUE";
+		}
 		return _ret;
 
 	}
@@ -45,13 +59,25 @@ public class TypeCheck implements GJVisitor<String, Int> {
 	}
 
 	public String visit(ClassDeclaration n, Int argu){
-		String _ret=null;
+		String _ret = "FALSE";
+		boolean check_1 = false;
+		boolean check_2 = false;
+		boolean check_3 = false;
 		n.f0.accept(this, argu);
-		n.f1.accept(this, argu);
+		if((n.f1.accept(this, argu)).equals(ID_TOKEN)){
+			check_1 = true;
+		}
 		n.f2.accept(this, argu);
-		n.f3.accept(this, argu);
+		if((n.f3.accept(this, argu)).equals(NODE_LIST_OPTIONAL_TOKEN)){
+			check_2 = true;
+		}
 		n.f4.accept(this, argu);
-		n.f5.accept(this, argu);
+		if((n.f5.accept(this, argu)).equals(NODE_TOKEN)){
+			check_3 = true;
+		}
+		if(check_1 && check_2 && check_3){
+			_ret = "TRUE";
+		}
 		return _ret;
 	}
 	public String visit(ClassExtendsDeclaration n, Int argu){
@@ -75,55 +101,110 @@ public class TypeCheck implements GJVisitor<String, Int> {
 	}
 
 	public String visit(MethodDeclaration n, Int argu) {
-		 String _ret=null;
+		 String _ret = "FALSE";
+		 boolean check_1 = false;
+		 boolean check_2 = false;
+		 boolean check_3 = false;
 		 n.f0.accept(this, argu);
 		 n.f1.accept(this, argu);
 		 n.f2.accept(this, argu);
-		 n.f3.accept(this, argu);
+		 if((n.f3.accept(this, argu)).equals(NODE_TOKEN)){
+			 check_1 = true;
+		 }
 		 n.f4.accept(this, argu);
 		 n.f5.accept(this, argu);
 		 n.f6.accept(this, argu);
-		 n.f7.accept(this, argu);
-		 n.f8.accept(this, argu);
+		 if(n.f7.accept(this, argu)).equals(NODE_LIST_OPTIONAL_TOKEN)){
+			 check_2 = true;
+		 }
+		 if(n.f8.accept(this, argu)).equals(NODE_LIST_OPTIONAL_TOKEN)){
+			 check_3 = true;
+		 }
+
 		 n.f9.accept(this, argu);
 		 n.f10.accept(this, argu);
 		 n.f11.accept(this, argu);
 		 n.f12.accept(this, argu);
+		 if(check_1 && check_2 && check_3){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 
 	public String visit(FormalParameterList n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
-		 n.f1.accept(this, argu);
+		 String _ret = "FALSE";
+		 boolean check_first = false;
+		 boolean check_second = false;
+		 if((n.f0.accept(this, argu)).equals(FORMALPARAMETER_TOKEN)){
+			 check_first = true;
+		 }
+		 if((n.f1.accept(this, argu)).equals(FORMAL_PARAMETER_REST_TOKEN)){
+			 check_second = true;
+		 }
+		 if(check_first && check_second){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 
 	public String visit(FormalParameter n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
-		 n.f1.accept(this, argu);
+		 String _ret = "FALSE";
+		 boolean check_first = false;
+		 boolean check_second = false;
+		 if((n.f0.accept(this, argu)).equals(TYPE_TOKEN)){
+			 check_first = true;
+		 }
+		 if((n.f1.accept(this, argu)).equals(ID_TOKEN)){
+			 check_second = true;
+		 }
+		 if(check_first && check_second){
+			 _ret = "TRUE";
+		 }
+
 		 return _ret;
 	}
 
 	public String visit(FormalParameterRest n, Int argu) {
-		 String _ret=null;
+		 String _ret = "FALSE";
+		 boolean check_first = false;
 		 n.f0.accept(this, argu);
-		 n.f1.accept(this, argu);
+		 if((n.f1.accept(this,argu)).equals(FORMALPARAMETER_TOKEN)){
+			 check_first = true;
+		 }
+		 if(check_first){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 
 	public String visit(Type n, Int argu) {
-		 String _ret=null;
+		 String _ret = "FALSE";
+		 boolean check_first = false;
 		 n.f0.accept(this, argu);
+		 if((n.f0.accept(this, argu)).equals(NODE_CHOICE_TOKEN)){
+			 check_first = true;
+		 }
+		 if(check_first){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 
 	public String visit(ArrayType n, Int argu) {
-		 String _ret=null;
+		 String _ret = "FALSE";
+		 boolean check_first = false;
+		 boolean check_last = false;
+
 		 n.f0.accept(this, argu);
-		 n.f1.accept(this, argu);
-		 n.f2.accept(this, argu);
+		 if((n.f1.accept(this, argu)).equals(NODE_TOKEN)){
+			check_first = true;
+		 }
+		 if((n.f2.accept(this, argu)).equals(NODE_TOKEN)){
+			 check_last = true;
+		 }
+		 if(check_first && check_last){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 

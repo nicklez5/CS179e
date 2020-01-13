@@ -10,6 +10,7 @@ import java.util.*;
  * Represents an optional grammar list, e.g. ( A )*
  */
 public class NodeListOptional implements NodeListInterface {
+  public String choice_num = "5";
    public NodeListOptional() {
       nodes = new Vector<Node>();
    }
@@ -31,10 +32,11 @@ public class NodeListOptional implements NodeListInterface {
       v.visit(this);
    }
    public <R,A> R accept(visitor.GJVisitor<R,A> v, A argu) {
-      return v.visit(this,argu);
+      return choice_num;
+      //return v.visit(this,argu);
    }
    public <R> R accept(visitor.GJNoArguVisitor<R> v) {
-      return v.visit(this);
+      return choice_num;
    }
    public <A> void accept(visitor.GJVoidVisitor<A> v, A argu) {
       v.visit(this,argu);
@@ -42,4 +44,3 @@ public class NodeListOptional implements NodeListInterface {
 
    public Vector<Node> nodes;
 }
-
