@@ -6,10 +6,22 @@ import static packagename.Constants.*;
 public class TypeCheck implements GJVisitor<String, Int> {
 
 	public String visit(Goal n, Int argu){
-		String _ret = null;
-		n.f0.accept(this, argu);
-		n.f1.accept(this, argu);
+		String _ret = "FALSE";
+
+		boolean check_first = false;
+		boolean check_sec = false;
+
+		if((n.f0.accept(this, argu)).equals(MAIN_CLASS_TOKEN)){
+			check_first = true;
+		}
+		if((n.f1.accept(this, argu)).equals(NODE_LIST_OPTIONAL_TOKEN)){
+			check_sec = true;
+		}
 		n.f2.accept(this, argu);
+
+		if(check_first && check_sec){
+			_ret = "TRUE";
+		}
 		return _ret;
 	}
 
@@ -53,8 +65,15 @@ public class TypeCheck implements GJVisitor<String, Int> {
 	}
 
 	public String visit(TypeDeclaration n, Int argu){
-		String _ret=null;
-		n.f0.accept(this, argu);
+		String _ret = "FALSE";
+		boolean check_1 = false;
+
+		if((n.f0.accept(this, argu)).equals(NODE_CHOICE_TOKEN)){
+			check_1 = true;
+		}
+		if(check_1){
+			_ret = "TRUE";
+		}
 		return _ret;
 	}
 
@@ -81,22 +100,46 @@ public class TypeCheck implements GJVisitor<String, Int> {
 		return _ret;
 	}
 	public String visit(ClassExtendsDeclaration n, Int argu){
-		String _ret=null;
-		n.f0.accept(this, argu);
+		String _ret = "FALSE";
+
+		boolean check_1 = false;
+		boolean check_2 = false;
+		boolean check_3 = false;
+		//Test for f0, f4 and f7.
+		if((n.f0.accept(this, argu)).equals(NODE_TOKEN)){
+			check_1 = true;
+		}
 		n.f1.accept(this, argu);
 		n.f2.accept(this, argu);
 		n.f3.accept(this, argu);
-		n.f4.accept(this, argu);
+		if((n.f4.accept(this, argu)).equals(NODE_TOKEN)){
+			check_2 = true;
+		}
 		n.f5.accept(this, argu);
 		n.f6.accept(this, argu);
-		n.f7.accept(this, argu);
+		if((n.f7.accept(this, argu)).equals(NODE_TOKEN)){
+			check_3 = true;
+		}
+
+		if(check_1 && check_2 && check_3){
+			_ret = "TRUE";
+		}
 		return _ret;
 	}
 	public String visit(VarDeclaration n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
-		 n.f1.accept(this, argu);
+		 String _ret = "FALSE";
+		 boolean check_1 = false;
+		 boolean check_2 = false;
+		 if((n.f0.accept(this, argu)).equals(TYPE_TOKEN)){
+			 check_1 = true;
+		 }
+		 if((n.f1.accept(this, argu)).equals(ID_TOKEN)){
+			 check_2 = true;
+		 }
 		 n.f2.accept(this, argu);
+		 if(check_1 && check_2){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 
@@ -547,11 +590,20 @@ public class TypeCheck implements GJVisitor<String, Int> {
 	 * f3 -> "]"
 	 */
 	public String visit(ArrayLookup n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
+		 String _ret = "FALSE";
+		 boolean check_first = false;
+		 boolean check_sec = false;
+		 if((n.f0.accept(this, argu)).equals(PRIMARY_EXP_TOKEN)){
+			 check_first = true;
+		 }
 		 n.f1.accept(this, argu);
-		 n.f2.accept(this, argu);
+		 if((n.f2.accept(this, argu)).equals(PRIMARY_EXP_TOKEN)){
+			 check_sec = true;
+		 }
 		 n.f3.accept(this, argu);
+		 if(check_first && check_sec){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 
@@ -561,10 +613,17 @@ public class TypeCheck implements GJVisitor<String, Int> {
 	 * f2 -> "length"
 	 */
 	public String visit(ArrayLength n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
+		 String _ret = "FALSE";
+		 boolean check_first = false;
+
+		 if((n.f0.accept(this, argu)).equals(PRIMARY_EXP_TOKEN)){
+			 check_first = true;
+		 }
 		 n.f1.accept(this, argu);
 		 n.f2.accept(this, argu);
+		 if(check_first){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 
@@ -577,10 +636,18 @@ public class TypeCheck implements GJVisitor<String, Int> {
 	 * f5 -> ")"
 	 */
 	public String visit(MessageSend n, Int argu) {
-		 String _ret=null;
-		 n.f0.accept(this, argu);
+		 String _ret = "FALSE";
+		 boolean check_first = false;
+		 boolean check_sec = false;
+		 boolean check_third = false;
+		 //check f0, f2 , f4
+		 if((n.f0.accept(this, argu)).equals(PRIMARY_EXP_TOKEN)){
+			 check_first = true;
+		 }
 		 n.f1.accept(this, argu);
-		 n.f2.accept(this, argu);
+		 if((n.f2.accept(this, argu)).equals(ID_TOKEN)){
+			 check_sec = true;
+		 }
 		 n.f3.accept(this, argu);
 		 n.f4.accept(this, argu);
 		 n.f5.accept(this, argu);

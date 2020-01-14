@@ -26,6 +26,7 @@ package syntaxtree;
  * f17 -> "}"
  */
 public class MainClass implements Node {
+   public String choice_num = "8";
    public NodeToken f0;
    public Identifier f1;
    public NodeToken f2;
@@ -91,13 +92,14 @@ public class MainClass implements Node {
       v.visit(this);
    }
    public <R,A> R accept(visitor.GJVisitor<R,A> v, A argu) {
-      return v.visit(this,argu);
+      return choice_num;
+      //return v.visit(this,argu);
    }
    public <R> R accept(visitor.GJNoArguVisitor<R> v) {
-      return v.visit(this);
+      return choice_num;
+      //return v.visit(this);
    }
    public <A> void accept(visitor.GJVoidVisitor<A> v, A argu) {
       v.visit(this,argu);
    }
 }
-

@@ -8,6 +8,7 @@ package syntaxtree;
  * Represents an grammar optional node, e.g. ( A )? or [ A ]
  */
 public class NodeOptional implements Node {
+   public String choice_num = "10";
    public NodeOptional() {
       node = null;
    }
@@ -26,10 +27,12 @@ public class NodeOptional implements Node {
       v.visit(this);
    }
    public <R,A> R accept(visitor.GJVisitor<R,A> v, A argu) {
-      return v.visit(this,argu);
+      return choice_num;
+      //return v.visit(this,argu);
    }
    public <R> R accept(visitor.GJNoArguVisitor<R> v) {
-      return v.visit(this);
+      return choice_num;
+      //return v.visit(this);
    }
    public <A> void accept(visitor.GJVoidVisitor<A> v, A argu) {
       v.visit(this,argu);
@@ -38,4 +41,3 @@ public class NodeOptional implements Node {
 
    public Node node;
 }
-
