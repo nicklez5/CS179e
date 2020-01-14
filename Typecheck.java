@@ -3,7 +3,7 @@ import visitor.*;
 import java.util.*;
 import static packagename.Constants.*;
 
-public class TypeCheck implements GJVisitor<String, Int> {
+public class TypeCheck implements GJVisitor<String, Int>  {
 
 	public String visit(Goal n, Int argu){
 		String _ret = "FALSE";
@@ -80,21 +80,16 @@ public class TypeCheck implements GJVisitor<String, Int> {
 	public String visit(ClassDeclaration n, Int argu){
 		String _ret = "FALSE";
 		boolean check_1 = false;
-		boolean check_2 = false;
-		boolean check_3 = false;
+
 		n.f0.accept(this, argu);
-		if((n.f1.accept(this, argu)).equals(ID_TOKEN)){
+		n.f1.accept(this, argu);
+		n.f2.accept(this, argu);
+		n.f3.accept(this, argu);
+		if((n.f4.accept(this, argu)).equals(NODE_LIST_OPTIONAL_TOKEN)){
 			check_1 = true;
 		}
-		n.f2.accept(this, argu);
-		if((n.f3.accept(this, argu)).equals(NODE_LIST_OPTIONAL_TOKEN)){
-			check_2 = true;
-		}
-		n.f4.accept(this, argu);
-		if((n.f5.accept(this, argu)).equals(NODE_TOKEN)){
-			check_3 = true;
-		}
-		if(check_1 && check_2 && check_3){
+		n.f5.accept(this, argu);
+		if(check_1){
 			_ret = "TRUE";
 		}
 		return _ret;
@@ -103,25 +98,20 @@ public class TypeCheck implements GJVisitor<String, Int> {
 		String _ret = "FALSE";
 
 		boolean check_1 = false;
-		boolean check_2 = false;
-		boolean check_3 = false;
-		//Test for f0, f4 and f7.
-		if((n.f0.accept(this, argu)).equals(NODE_TOKEN)){
-			check_1 = true;
-		}
+
+		//Test for F6
+		n.f0.accept(this, argu);
 		n.f1.accept(this, argu);
 		n.f2.accept(this, argu);
 		n.f3.accept(this, argu);
-		if((n.f4.accept(this, argu)).equals(NODE_TOKEN)){
-			check_2 = true;
-		}
+		n.f4.accept(this, argu);
 		n.f5.accept(this, argu);
-		n.f6.accept(this, argu);
-		if((n.f7.accept(this, argu)).equals(NODE_TOKEN)){
-			check_3 = true;
+		if((n.f6.accept(this, argu)).equals(NODE_LIST_OPTIONAL_TOKEN)){
+			check_1 = true;
 		}
+		n.f7.accept(this, argu);
 
-		if(check_1 && check_2 && check_3){
+		if(check_1){
 			_ret = "TRUE";
 		}
 		return _ret;
@@ -148,24 +138,27 @@ public class TypeCheck implements GJVisitor<String, Int> {
 		 boolean check_1 = false;
 		 boolean check_2 = false;
 		 boolean check_3 = false;
+
+		 //Check for the statement which is f8
+		 //Check for the type - f1 and expression - f10
 		 n.f0.accept(this, argu);
-		 n.f1.accept(this, argu);
-		 n.f2.accept(this, argu);
-		 if((n.f3.accept(this, argu)).equals(NODE_TOKEN)){
+		 if((n.f1.accept(this, argu)).equals(TYPE_TOKEN)){
 			 check_1 = true;
 		 }
+		 n.f2.accept(this, argu);
+		 n.f3.accept(this, argu);
 		 n.f4.accept(this, argu);
 		 n.f5.accept(this, argu);
 		 n.f6.accept(this, argu);
-		 if(n.f7.accept(this, argu)).equals(NODE_LIST_OPTIONAL_TOKEN)){
+		 n.f7.accept(this, argu);
+		 if((n.f8.accept(this, argu)).equals(STATEMENT_TOKEN)){
 			 check_2 = true;
-		 }
-		 if(n.f8.accept(this, argu)).equals(NODE_LIST_OPTIONAL_TOKEN)){
-			 check_3 = true;
 		 }
 
 		 n.f9.accept(this, argu);
-		 n.f10.accept(this, argu);
+		 if((n.f10.accept(this, argu)).equals(EXP_TOKEN)){
+			 check_3 = true;
+		 }
 		 n.f11.accept(this, argu);
 		 n.f12.accept(this, argu);
 		 if(check_1 && check_2 && check_3){
@@ -181,7 +174,7 @@ public class TypeCheck implements GJVisitor<String, Int> {
 		 if((n.f0.accept(this, argu)).equals(FORMALPARAMETER_TOKEN)){
 			 check_first = true;
 		 }
-		 if((n.f1.accept(this, argu)).equals(FORMAL_PARAMETER_REST_TOKEN)){
+		 if((n.f1.accept(this, argu)).equals(NODE_LIST_OPTIONAL_TOKEN)){
 			 check_second = true;
 		 }
 		 if(check_first && check_second){
@@ -223,7 +216,6 @@ public class TypeCheck implements GJVisitor<String, Int> {
 	public String visit(Type n, Int argu) {
 		 String _ret = "FALSE";
 		 boolean check_first = false;
-		 n.f0.accept(this, argu);
 		 if((n.f0.accept(this, argu)).equals(NODE_CHOICE_TOKEN)){
 			 check_first = true;
 		 }
@@ -281,7 +273,7 @@ public class TypeCheck implements GJVisitor<String, Int> {
 		 String _ret = "FALSE";
 		 boolean check_first = false;
 
-		 if((n.f0.accept(this, argu)).equals(STATEMENT_TOKEN)){
+		 if((n.f0.accept(this, argu)).equals(NODE_CHOICE_TOKEN)){
 			 check_first = true;
 		 }
 		 if(check_first){
@@ -293,18 +285,15 @@ public class TypeCheck implements GJVisitor<String, Int> {
 	public String visit(Block n, Int argu) {
 		 String _ret = "FALSE";
 		 boolean check_first = false;
-		 boolean check_third = false;
 
-		 if((n.f0.accept(this, argu)).equals(NODE_TOKEN)){
+
+		 n.f0.accept(this, argu);
+		 if((n.f1.accept(this, argu)).equals(NODE_LIST_OPTIONAL_TOKEN)){
 			 check_first = true;
 		 }
-		 n.f1.accept(this, argu);
+		 n.f2.accept(this, argu);
 
-		 if((n.f2.accept(this, argu)).equals(NODE_TOKEN)){
-			 check_third = true;
-		 }
-
-		 if(check_first && check_third){
+		 if(check_first){
 			 _ret = "TRUE";
 		 }
 		 return _ret;
@@ -417,7 +406,7 @@ public class TypeCheck implements GJVisitor<String, Int> {
 		 String _ret = "FALSE";
 
 		 boolean check_third = false;
-		 boolean check_fifth = false;
+
 
 		 n.f0.accept(this, argu);
 		 n.f1.accept(this, argu);
@@ -426,12 +415,9 @@ public class TypeCheck implements GJVisitor<String, Int> {
 			 check_third = true;
 		 }
 		 n.f3.accept(this, argu);
+		 n.f4.accept(this, argu);
 
-		 if((n.f4.accept(this, argu)).equals(EXP_TOKEN)){
-			 check_fifth = true;
-		 }
-
-		 if(check_third && check_fifth){
+		 if(check_third){
 			 _ret = "TRUE";
 		 }
 
@@ -442,7 +428,7 @@ public class TypeCheck implements GJVisitor<String, Int> {
 		 String _ret = "FALSE";
 		 boolean check_first = false;
 
-		 if((n.f0.accept(this, argu)).equals(EXP_TOKEN)){
+		 if((n.f0.accept(this, argu)).equals(NODE_CHOICE_TOKEN)){
 			 check_first = true;
 		 }
 		 if(check_first){
@@ -638,19 +624,19 @@ public class TypeCheck implements GJVisitor<String, Int> {
 	public String visit(MessageSend n, Int argu) {
 		 String _ret = "FALSE";
 		 boolean check_first = false;
-		 boolean check_sec = false;
-		 boolean check_third = false;
-		 //check f0, f2 , f4
-		 if((n.f0.accept(this, argu)).equals(PRIMARY_EXP_TOKEN)){
+
+		 //check f4
+		 n.f0.accept(this, argu);
+		 n.f1.accept(this, argu);
+		 n.f2.accept(this, argu);
+		 n.f3.accept(this, argu);
+		 if((n.f4.accept(this, argu)).equals(NODE_OPTIONAL_TOKEN)){
 			 check_first = true;
 		 }
-		 n.f1.accept(this, argu);
-		 if((n.f2.accept(this, argu)).equals(ID_TOKEN)){
-			 check_sec = true;
-		 }
-		 n.f3.accept(this, argu);
-		 n.f4.accept(this, argu);
 		 n.f5.accept(this, argu);
+		 if(check_first){
+			 _ret = "TRUE";
+		 }
 		 return _ret;
 	}
 
