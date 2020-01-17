@@ -15,52 +15,52 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
    // Auto class visitors--probably don't need to be overridden.
    //
    public R visit(NodeList n, A argu) {
-      R _ret=null;
-      int _count=0;
-      for ( Enumeration<Node> e = n.elements(); e.hasMoreElements(); ) {
-         e.nextElement().accept(this,argu);
-         _count++;
-      }
-      return _ret;
-   }
+     R _ret=null;
+     int _count=0;
+     for ( Enumeration<Node> e = n.elements(); e.hasMoreElements(); ) {
+        e.nextElement().accept(this,argu);
+        _count++;
+     }
+     return _ret;
+  }
 
-   public R visit(NodeListOptional n, A argu) {
-      if ( n.present() ) {
-         R _ret=null;
-         int _count=0;
-         for ( Enumeration<Node> e = n.elements(); e.hasMoreElements(); ) {
-            e.nextElement().accept(this,argu);
-            _count++;
-         }
-         return _ret;
-      }
-      else
-         return null;
-   }
+  public R visit(NodeListOptional n, A argu) {
+     if ( n.present() ) {
+        R _ret=null;
+        int _count=0;
+        for ( Enumeration<Node> e = n.elements(); e.hasMoreElements(); ) {
+           e.nextElement().accept(this,argu);
+           _count++;
+        }
+        return _ret;
+     }
+     else
+        return null;
+  }
 
-   public R visit(NodeOptional n, A argu) {
-      if ( n.present() )
-         return n.node.accept(this,argu);
-      else
-         return null;
-   }
+  public R visit(NodeOptional n, A argu) {
+     if ( n.present() )
+        return n.node.accept(this,argu);
+     else
+        return null;
+  }
 
-   public R visit(NodeSequence n, A argu) {
-      R _ret=null;
-      int _count=0;
-      for ( Enumeration<Node> e = n.elements(); e.hasMoreElements(); ) {
-         e.nextElement().accept(this,argu);
-         _count++;
-      }
-      return _ret;
-   }
+  public R visit(NodeSequence n, A argu) {
+     R _ret=null;
+     int _count=0;
+     for ( Enumeration<Node> e = n.elements(); e.hasMoreElements(); ) {
+        e.nextElement().accept(this,argu);
+        _count++;
+     }
+     return _ret;
+  }
 
-   public R visit(NodeToken n, A argu) { return null; }
+  public R visit(NodeToken n, A argu) { return null; }
+
 
    //
    // User-generated visitor methods below
    //
-
    /**
     * f0 -> MainClass()
     * f1 -> ( TypeDeclaration() )*
@@ -678,4 +678,5 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
       return _ret;
    }
 
-}
+
+  }

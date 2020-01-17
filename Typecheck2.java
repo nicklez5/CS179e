@@ -3,7 +3,7 @@ import visitor.*;
 import java.util.*;
 import static packagename.Constants.*;
 
-public class TypeCheck2 implements DepthFirstVisitor  {
+public class TypeCheck2 implements GJVisitor<R,A>  {
 
 	public String visit(Goal n, Int argu){
 		String _ret = "FALSE";

@@ -3,7 +3,7 @@ import visitor.*;
 import java.util.*;
 import static packagename.Constants.*;
 
-public class TypeCheck implements GJVisitor<String, Int>  {
+public class TypeCheck extends GJDepthFirst<String, Int>  {
 
 	public String visit(Goal n, Int argu){
 		String _ret = "FALSE";
