@@ -40,4 +40,3 @@ public class ArrayType implements Node {
       v.visit(this,argu);
    }
 }
-

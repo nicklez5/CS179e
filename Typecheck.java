@@ -4,6 +4,9 @@ import java.util.*;
 import static packagename.Constants.*;
 
 public class TypeCheck extends GJDepthFirst<String, Int>  {
+	//Input of information from a file
+	//Stack variable
+	//Pop out the item from stack after it has been type checked.
 
 	public String visit(Goal n, Int argu){
 		String _ret = "FALSE";

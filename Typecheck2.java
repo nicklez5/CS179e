@@ -1,4 +1,4 @@
-Stringimport syntaxtree.*;
+import syntaxtree.*;
 import visitor.*;
 import java.util.*;
 import static packagename.Constants.*;

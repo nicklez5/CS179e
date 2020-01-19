@@ -52,4 +52,3 @@ public class ClassDeclaration implements Node {
       v.visit(this,argu);
    }
 }
-
