@@ -14,7 +14,7 @@ public class MinusExpression implements Node {
    public PrimaryExpression f0;
    public NodeToken f1;
    public PrimaryExpression f2;
-
+   public int field = 3;
    public MinusExpression(PrimaryExpression n0, NodeToken n1, PrimaryExpression n2) {
       f0 = n0;
       f1 = n1;
@@ -40,4 +40,3 @@ public class MinusExpression implements Node {
       v.visit(this,argu);
    }
 }
-
