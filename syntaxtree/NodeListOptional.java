@@ -11,6 +11,7 @@ import java.util.*;
  */
 public class NodeListOptional implements NodeListInterface {
   public String choice_num = "5";
+  public int field;
    public NodeListOptional() {
       nodes = new Vector<Node>();
    }

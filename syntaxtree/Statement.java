@@ -16,9 +16,11 @@ package syntaxtree;
 public class Statement implements Node {
    public NodeChoice f0;
    public static String choice_num = "6";
+   public int statement_choice;
 
    public Statement(NodeChoice n0) {
       f0 = n0;
+      statement_choice = n0.whichChoice;
    }
 
    public void accept(visitor.Visitor v) {

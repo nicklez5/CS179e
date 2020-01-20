@@ -4,6 +4,11 @@ import java.util.*;
 import static packagename.Constants.*;
 
 public class TypeCheck extends GJDepthFirst<String, Int>  {
+	Stack<Node>
+	public TypeCheck(){
+
+	}
+
 
 	public String visit(Goal n, Int argu){
 		String _ret = "FALSE";
