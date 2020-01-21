@@ -19,10 +19,11 @@ package syntaxtree;
 public class PrimaryExpression implements Node {
    public NodeChoice f0;
    public String choice_num = "1";
-
+   public int primaryexpression_choice;
 
    public PrimaryExpression(NodeChoice n0) {
       f0 = n0;
+      primaryexpression_choice = n0.whichChoice;
    }
 
    public void accept(visitor.Visitor v) {

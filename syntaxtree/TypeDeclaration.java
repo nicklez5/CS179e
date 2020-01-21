@@ -11,9 +11,10 @@ package syntaxtree;
  */
 public class TypeDeclaration implements Node {
    public NodeChoice f0;
-
+   public int typedeclaration_choice;
    public TypeDeclaration(NodeChoice n0) {
       f0 = n0;
+      typedeclaration_choice = n0.whichChoice;
    }
 
    public void accept(visitor.Visitor v) {
@@ -29,4 +30,3 @@ public class TypeDeclaration implements Node {
       v.visit(this,argu);
    }
 }
-

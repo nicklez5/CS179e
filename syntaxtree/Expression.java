@@ -19,9 +19,10 @@ package syntaxtree;
 public class Expression implements Node {
    public NodeChoice f0;
    public String choice_num = "3";
-
+   public int exp_choice;
    public Expression(NodeChoice n0) {
       f0 = n0;
+      exp_choice = n0.whichChoice;
    }
 
    public void accept(visitor.Visitor v) {

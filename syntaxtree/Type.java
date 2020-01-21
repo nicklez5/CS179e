@@ -14,8 +14,10 @@ package syntaxtree;
 public class Type implements Node {
    public NodeChoice f0;
    public String choice_num = "9";
+   public int type_choice;
    public Type(NodeChoice n0) {
       f0 = n0;
+      type_choice = n0.whichChoice;
    }
 
    public void accept(visitor.Visitor v) {
