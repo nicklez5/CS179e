@@ -36,5 +36,5 @@ public class Helper_Functions{
       }
   }
   //Given that NodeListOptional in a Class Declaration. extract the type environment
-  public
+  public int fields()
 }

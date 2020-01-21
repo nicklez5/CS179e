@@ -29,7 +29,7 @@ public class TypeCheck extends GJDepthFirst<String, Int>  {
 		String _ret = "FALSE";
 		boolean check_first = false;
 		boolean check_sec = false;
-		boolean chek_third = false;
+		boolean check_third = false;
 		n.f0.accept(this, argu);
 		if((n.f1.accept(this,argu)).equals(ID_TOKEN)){
 			check_first = true;
