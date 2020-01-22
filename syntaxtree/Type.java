@@ -17,7 +17,7 @@ public class Type implements Node {
    public int type_choice;
    public Type(NodeChoice n0) {
       f0 = n0;
-      type_choice = n0.whichChoice;
+      type_choice = n0.which;
    }
 
    public void accept(visitor.Visitor v) {

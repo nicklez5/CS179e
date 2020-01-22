@@ -3,25 +3,59 @@ import visitor.*;
 import java.util.*;
 import static packagename.Constants.*;
 
-public class TypeCheck2 implements GJVisitor<R,A>  {
+class TypeCheck extends GJDepthFirst<String, Int>  {
+
+	Stack<Node> token_stack = new Stack<Node>();
+	MiniJavaParser token_parser;
+	Scope_Check scope_map = new Scope_Check();
+	public TypeCheck(){
+
+		Token first_token = new Token();
+		token_parser = new MiniJavaParser(System.in);
+		first_token = token_parser.token;
+		token_stack.push(first_token);
+		//Inserting tokens from the parser to a stack
+		while(first_token.kind != 0){
+			token_stack.push(first_token);
+			first_token = token_parser.getNextToken();
+		}
+		//Pop out the stack tokens and insert into a scope map
+		while(!token_stack.empty()){
+			Token second_token = new Token();
+			second_token = token_stack.pop();
+			if(second_token.kind == 44){
+
+			}
+		}
+
+
+	}
+	//Automatically runs
+	public static void main (String[] args){
+
+		Goal holy_goal;
+		MiniJavaParser xyz = new MiniJavaParser(System.in);
+		holy_goal = xyz.goal();
+		TypeCheck test_me = new TypeCheck();
+		//Missing an argument
+		holy_goal.accept(test_me);
+		/*
+			 return test_me.visit(holy_goal,argu)
+		*/
+		System.out.println(test_me)
+
+
+		//Typecheck > randomfile.Java
+		//Have a parser take that object and read in the files.
+		//Unleash the typecheck
+
+	}
 
 	public String visit(Goal n, Int argu){
 		String _ret = "FALSE";
-
-		boolean check_first = false;
-		boolean check_sec = false;
-
-		if((n.f0.accept(this, argu)).equals(MAIN_CLASS_TOKEN)){
-			check_first = true;
-		}
-		if((n.f1.accept(this, argu)).equals(NODE_LIST_OPTIONAL_TOKEN)){
-			check_sec = true;
-		}
+		n.f0.accept(this, argu);
+		n.f1.accept(this, argu);
 		n.f2.accept(this, argu);
-
-		if(check_first && check_sec){
-			_ret = "TRUE";
-		}
 		return _ret;
 	}
 
@@ -29,7 +63,7 @@ public class TypeCheck2 implements GJVisitor<R,A>  {
 		String _ret = "FALSE";
 		boolean check_first = false;
 		boolean check_sec = false;
-		boolean chek_third = false;
+		boolean check_third = false;
 		n.f0.accept(this, argu);
 		if((n.f1.accept(this,argu)).equals(ID_TOKEN)){
 			check_first = true;
@@ -60,6 +94,7 @@ public class TypeCheck2 implements GJVisitor<R,A>  {
 		if(check_first && check_sec && check_third){
 			_ret = "TRUE";
 		}
+
 		return _ret;
 
 	}

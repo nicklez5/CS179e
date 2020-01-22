@@ -10,9 +10,10 @@ package syntaxtree;
  */
 public class Identifier implements Node {
    public NodeToken f0;
-   public String choice_num = "4";
+   public String id_value;
    public Identifier(NodeToken n0) {
       f0 = n0;
+      id_value = n0.toString();
    }
 
    public void accept(visitor.Visitor v) {

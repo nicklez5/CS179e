@@ -33,14 +33,10 @@ public class PrimaryExpression implements Node {
    //public <R,A> bool accept(visitor ) because it would ruin the idea of implementing
 
    public <R,A> R accept(visitor.GJVisitor<R,A> v, A argu) {
-
-      return choice_num;
-      //return v.visit(this,argu);
+     return v.visit(this,argu);
    }
    public <R> R accept(visitor.GJNoArguVisitor<R> v) {
-
-      return choice_num;
-      //return v.visit(this);
+     return v.visit(this,argu);
    }
    public <A> void accept(visitor.GJVoidVisitor<A> v, A argu) {
 

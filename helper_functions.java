@@ -36,5 +36,18 @@ public class Helper_Functions{
       }
   }
   //Given that NodeListOptional in a Class Declaration. extract the type environment
-  public int fields()
+  public int fields(){
+
+  }
+  public String return_type(Int type_number){
+    if(type_number == ARRAY_TYPE){
+       return "ARRAY";
+    }else if(type_number == BOOL_TYPE){
+      return "BOOL";
+    }else if(type_number == INT_TYPE){
+      return "INT";
+    }else if(type_number == ID_TYPE){
+      return "ID";
+    }
+  }
 }

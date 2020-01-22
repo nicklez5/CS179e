@@ -371,6 +371,7 @@ public class DepthFirstVisitor implements Visitor {
       n.f0.accept(this);
       n.f1.accept(this);
       n.f2.accept(this);
+      //bool type
    }
 
    /**
@@ -382,6 +383,7 @@ public class DepthFirstVisitor implements Visitor {
       n.f0.accept(this);
       n.f1.accept(this);
       n.f2.accept(this);
+      //Bool type
    }
 
    /**
@@ -390,10 +392,11 @@ public class DepthFirstVisitor implements Visitor {
     * f2 -> PrimaryExpression()
     */
    public void visit(PlusExpression n) {
-      
+
       n.f0.accept(this);
       n.f1.accept(this);
       n.f2.accept(this);
+      //Int type
 
    }
 
@@ -406,7 +409,9 @@ public class DepthFirstVisitor implements Visitor {
       n.f0.accept(this);
       n.f1.accept(this);
       n.f2.accept(this);
+      //Int type
    }
+
 
    /**
     * f0 -> PrimaryExpression()
@@ -417,6 +422,7 @@ public class DepthFirstVisitor implements Visitor {
       n.f0.accept(this);
       n.f1.accept(this);
       n.f2.accept(this);
+      //Int type
    }
 
    /**
@@ -430,6 +436,7 @@ public class DepthFirstVisitor implements Visitor {
       n.f1.accept(this);
       n.f2.accept(this);
       n.f3.accept(this);
+      //array type
    }
 
    /**
@@ -441,6 +448,7 @@ public class DepthFirstVisitor implements Visitor {
       n.f0.accept(this);
       n.f1.accept(this);
       n.f2.accept(this);
+      //array type
    }
 
    /**
@@ -458,6 +466,7 @@ public class DepthFirstVisitor implements Visitor {
       n.f3.accept(this);
       n.f4.accept(this);
       n.f5.accept(this);
+      //id type
    }
 
    /**

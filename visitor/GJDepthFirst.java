@@ -69,6 +69,9 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
    public R visit(Goal n, A argu) {
       R _ret=null;
       n.f0.accept(this, argu);
+      /*
+        returns (v.visit(this,argu)) from MAINCLASS of Goal
+      */
       n.f1.accept(this, argu);
       n.f2.accept(this, argu);
       return _ret;

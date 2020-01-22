@@ -22,11 +22,10 @@ public class NodeChoice implements Node {
       choice.accept(v);
    }
    public <R,A> R accept(visitor.GJVisitor<R,A> v, A argu) {
-     return choice_num;
-      //return choice.accept(v,argu);
+      return choice.accept(v,argu);
    }
    public <R> R accept(visitor.GJNoArguVisitor<R> v) {
-      return choice_num;
+      return choice.accept(v);
    }
    public <A> void accept(visitor.GJVoidVisitor<A> v, A argu) {
       choice.accept(v,argu);
