@@ -10,5 +10,9 @@ public class Scope_Check{
     public void add_me(String xyz,String  zzz){
       scope_map.put(xyz,zzz);
     }
+    public String fields(String id){
+      String str_1 = scope_map.get(id);
+      return str_1;
+    }
 
 }

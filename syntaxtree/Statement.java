@@ -27,12 +27,10 @@ public class Statement implements Node {
       v.visit(this);
    }
    public <R,A> R accept(visitor.GJVisitor<R,A> v, A argu) {
-      return choice_num;
-      //return v.visit(this,argu);
+      return v.visit(this,argu);
    }
    public <R> R accept(visitor.GJNoArguVisitor<R> v) {
-      return choice_num;
-      //return v.visit(this);
+      return v.visit(this);
    }
    public <A> void accept(visitor.GJVoidVisitor<A> v, A argu) {
       v.visit(this,argu);

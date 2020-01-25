@@ -6,12 +6,12 @@ import static packagename.Constants.*;
 class TypeCheck extends GJDepthFirst<String, Int>  {
 
 	Stack<Node> token_stack = new Stack<Node>();
-	MiniJavaParser token_parser;
-	Scope_Check scope_map = new Scope_Check();
 	public TypeCheck(){
 
-		Token first_token = new Token();
-		token_parser = new MiniJavaParser(System.in);
+		//Token first_token = new Token();
+		//token_parser = new MiniJavaParser(System.in);
+
+		/*
 		first_token = token_parser.token;
 		token_stack.push(first_token);
 		//Inserting tokens from the parser to a stack
@@ -26,7 +26,12 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 			if(second_token.kind == 44){
 
 			}
-		}
+	  }
+		*/
+
+		//Because it traverses all of the java syntax tree by the visitor
+		//It would output it all into a stack which can be bunch of strings.
+
 
 
 	}
@@ -36,10 +41,14 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 		Goal holy_goal;
 		MiniJavaParser xyz = new MiniJavaParser(System.in);
 		holy_goal = xyz.goal();
+		Depth_Type_Check sym_check = new Depth_Type_Check();
 		TypeCheck test_me = new TypeCheck();
+
 		//Missing an argument
-		holy_goal.accept(test_me);
+		holy_goal.accept(sym_check);
+		holy_goal.accept(test_me,1);
 		/*
+
 			 return test_me.visit(holy_goal,argu)
 		*/
 		System.out.println(test_me)

@@ -13,7 +13,7 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		primary_exp_number = 0;
 		store_assign = 0;
 		empty_id = "";
-		Symbol_Table = new Scope_Check();
+		sym_table = new Scope_Check();
 
 	}
 
@@ -121,6 +121,8 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f1.accept(this);
 
 		 id_name = n.f1.id_value;
+
+		 //Check if a map contains this key
 		 if(!sym_table.containsKey(id_name)){
 			 sym_table.add_me(id_name,Helper_Functions.return_type(n.f0.type_choice));
 		 }
@@ -353,11 +355,13 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f1.accept(this);
 		 n.f2.accept(this);
 
+		 /*
 		 String xyz = "p" + primary_exp_number;
 		 primary_exp_number++;
 		 xyz = xyz.concat(" " + n.f1.toString() + " " + "p" + Integer.toString(primary_exp_number));
 		 sym_table.add_me(xyz,BOOL_TYPE);
 		 primary_exp_number++;
+		 */
 	}
 
 	/**
@@ -371,12 +375,13 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f1.accept(this);
 		 n.f2.accept(this);
 
+		 /*
 		 String xyz = "p" + primary_exp_number;
 		 primary_exp_number++;
 		 xyz = xyz.concat(" " + n.f1.toString() + " " + "p" + Integer.toString(primary_exp_number));
 		 sym_table.add_me(xyz,BOOL_TYPE);
 		 primary_exp_number++;
-
+		 */
 
 	}
 
@@ -391,12 +396,14 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f0.accept(this);
 		 n.f1.accept(this);
 		 n.f2.accept(this);
+
+		 /*
 		 String xyz = "p" + primary_exp_number;
 		 primary_exp_number++;
 		 xyz = xyz.concat(" " + n.f1.toString() + " " + "p" + Integer.toString(primary_exp_number));
 		 sym_table.add_me(xyz,INT_TYPE);
 		 primary_exp_number++;
-
+		 */
 
 	}
 
@@ -410,12 +417,14 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f0.accept(this);
 		 n.f1.accept(this);
 		 n.f2.accept(this);
+
+		 /*
 		 String xyz = "p" + primary_exp_number;
 		 primary_exp_number++;
 		 xyz = xyz.concat(" " + n.f1.toString() + " " + "p" + Integer.toString(primary_exp_number));
 		 sym_table.add_me(xyz,INT_TYPE);
 		 primary_exp_number++;
-
+		 */
 	}
 
 	/**
@@ -428,11 +437,14 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f0.accept(this);
 		 n.f1.accept(this);
 		 n.f2.accept(this);
+
+		 /*
 		 String xyz = "p" + primary_exp_number;
 		 primary_exp_number++;
 		 xyz = xyz.concat(" " + n.f1.toString() + " " + "p" + Integer.toString(primary_exp_number));
 		 sym_table.add_me(xyz,INT_TYPE);
 		 primary_exp_number++;
+		 */
 	}
 
 	/**
@@ -574,8 +586,12 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	public void visit(AllocationExpression n) {
 		 n.f0.accept(this);
 		 n.f1.accept(this);
-		 String xyz = n.f1.id_value;
-		 sym_table.add_me(empty_id,xyz);
+		 if(store_assign == 1){
+			 String xyz = n.f1.id_value;
+			 sym_table.add_me(empty_id,xyz);
+			 store_assign = 0;
+		 }
+
 		 n.f2.accept(this);
 		 n.f3.accept(this);
 	}
