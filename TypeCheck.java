@@ -35,7 +35,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 //Because it traverses all of the java syntax tree by the visitor
 //It would output it all into a stack which can be bunch of strings.
 
-}
+	}
 public TypeCheck(Depth_Type_Check regular_check){
 	current_sym_table = regular_check.sym_table;
 	current_class_sym = regular_check.class_sym;
@@ -70,15 +70,17 @@ f1 - (typedeclaration_choice) *
 f2 - EOF
 */
 public String visit(Goal n, Int argu){
-
+	String ret_1;
 	String str_1;
 	String str_2;
 	String true_value = "TRUE";
-	Vector<String> class_title;
+	Vector<String> class_title = new Vector<String>();
 
+	//Main Class
 	str_1 = n.f0.accept(this, argu);
 	class_title.add(current_sym_table.class_name_id);
 
+	//Type Declaration
 	str_2 = n.f1.accept(this, argu);
 
 	//Check for distinct
@@ -92,18 +94,19 @@ public String visit(Goal n, Int argu){
 		if(temp_type.f0.which == 0){
 			temp_class_declare = temp_type.f0.choice;
 			class_title.add(temp_class_declare.f1.id_value);
+		}else if(temp_type.f0.which == 1){
+			temp_ext_class_declare = temp_type.f0.choice;
+			class_title.add(temp_ext_class_declare.f1.id_value);
 		}
-		temp_type.f0.choice
 	}
-
-
-	class_title.add(n.f1)
 	n.f2.accept(this, argu);
-	if(str_1.equals(true_value) && str_2.equals(true_value)){
-		return "TRUE";
-	}else{
+	if(!Helper_Functions.check_distinct(class_title)){
 		return "FALSE";
 	}
+	if(str_1.equals("TRUE") && str_2.equals("TRUE")){
+		return "TRUE";
+	}
+
 }
 
 /**
@@ -127,10 +130,15 @@ public String visit(Goal n, Int argu){
 * f17 -> "}"
 */
 public String visit(MainClass n, Int argu){
-	String _ret;
+	String _ret = "FALSE";
 	String class_name;
 
 	n.f0.accept(this, argu);
+
+	//Check for the distinct in the VarDeclaration
+	Vector<String> temp_variables = new Vector<String>();
+	Vector<String> temp_statement_variables = new Vector<String>();
+	Vector<Node> temp_node_var;
 
 	boolean class_found = false;
 	class_name = n.f1.accept(this, argu));
@@ -144,7 +152,6 @@ public String visit(MainClass n, Int argu){
 	}
 
 	if(!class_found){
-		_ret = "FALSE";
 		return _ret;
 	}
 
@@ -161,7 +168,34 @@ public String visit(MainClass n, Int argu){
 	n.f12.accept(this, argu);
 	n.f13.accept(this, argu);
 	n.f14.accept(this, argu);
-	_ret = n.f15.accept(this, argu);
+
+	//Check for distinct ness
+	temp_node_var = n.f14.nodes;
+	Iterator _itr = temp_node_var.iterator();
+	VarDeclaration temp_random_var;
+	while(_itr.hasNext()){
+		temp_random_var = _itr.next();
+		temp_variables.add(temp_random_var.f1.f0.toString());
+	}
+	//If all failed return fail
+	if(!Helper_Functions.check_distinct(temp_variables)){
+		return _ret;
+	}
+
+	//Check for success in Statements
+	n.f15.accept(this, argu);
+	temp_node_var = n.f15.nodes;
+	_itr = temp_node_var.iterator();
+	Statement temp_statement;
+	while(_itr.hasNext()){
+		temp_statement = _itr.next();
+		temp_statement_variables.add(this.visit(temp_statement,1));
+	}
+	if(!Helper_Functions.check_success(temp_statement_variables)){
+		return _ret;
+	}
+
+	_ret = "TRUE";
 	n.f16.accept(this, argu);
 	n.f17.accept(this, argu);
 	return _ret;
@@ -187,10 +221,19 @@ public String visit(TypeDeclaration n, Int argu){
 * f5 -> "}"
 */
 public String visit(ClassDeclaration n, Int argu){
-	String _ret;
+	String _ret = "FALSE";
 	String class_name;
+	Vector<String> list_of_var_ids = new Vector<String>();
+	Vector<String> list_of_method_ids = new Vector<String>();
 
+	Vector<Node> list_var_nodes;
+	Vector<Node> list_method_nodes;
 	n.f0.accept(this, argu);
+
+
+
+
+
 	boolean class_found = false;
 
 	class_name = n.f1.accept(this, argu);
@@ -208,8 +251,31 @@ public String visit(ClassDeclaration n, Int argu){
 	}
 	n.f2.accept(this, argu);
 	n.f3.accept(this, argu);
-	_ret = n.f4.accept(this, argu);
+	list_var_nodes = n.f3.nodes;
+	Iterator _itr = list_var_nodes.iterator();
+	VarDeclaration temp_var_dec;
+	while(_itr.hasNext()){
+		temp_var_dec = _itr.next();
+		list_of_var_ids.add(temp_var_dec.f1.f0.toString());
+	}
+	if(!Helper_Functions.check_distinct(list_of_var_ids)){
+		return _ret;
+	}
+	n.f4.accept(this, argu);
+	list_method_nodes = n.f4.nodes;
+	Iterator _itr2 = list_method_nodes.iterator();
+	MethodDeclaration temp_method_dec;
+	while(_itr2.hasNext()){
+		temp_method_dec = _itr2.next();
+		list_of_method_ids.add(temp_method_dec.f2.f0.toString());
+		list_of_method_ids.add(this.visit(temp_method_dec,1));
+	}
+	//Check for distinct method names and false value from the methods
+	if((!Helper_Functions.check_distinct(list_of_method_ids)) || (!Helper_Functions.check_success(list_of_method_ids))) {
+		return _ret;
+	}
 	n.f5.accept(this, argu);
+	_ret = "TRUE";
 
 	return _ret;
 }
@@ -226,13 +292,23 @@ public String visit(ClassDeclaration n, Int argu){
 */
 public String visit(ClassExtendsDeclaration n, Int argu){
 	String _ret = "FALSE";
+
+	Vector<String> list_of_var_ids = new Vector<String>();
+	Vector<String> list_of_methods_ids = new Vector<String>();
+
+	Vector<Node> list_var_nodes;
+	Vector<Node> list_method_nodes;
+
 	String current_class_name;
 	String extending_class_name;
 	String method_id_name;
 	boolean class_found = false;
 	String check_method;
+
 	//Test for F6
 	n.f0.accept(this, argu);
+
+	//Getting the class name and setting the current table to that scope
 	current_class_name = n.f1.accept(this, argu);
 	Iterator _it = current_class_sym.iterator();
 	while(_it.hasNext()){
@@ -242,6 +318,7 @@ public String visit(ClassExtendsDeclaration n, Int argu){
 			break;
 		}
 	}
+	//If there is no class of that name found. Remove it.
 	if(!class_found){
 		_ret = "FALSE";
 		return _ret;
@@ -251,6 +328,36 @@ public String visit(ClassExtendsDeclaration n, Int argu){
 	extending_class_name = n.f3.accept(this, argu);
 	n.f4.accept(this, argu);
 	n.f5.accept(this, argu);
+
+	//Check for Similarity of the variable declaration
+	list_var_nodes = n.f5.nodes;
+	Iterator _itr = list_var_nodes.iterator();
+	VarDeclaration temp_var_dec;
+	while(_itr.hasNext()){
+		temp_var_dec = _itr.next();
+		list_of_var_ids.add(temp_var_dec.f1.f0.toString());
+	}
+	if(!Helper_Functions.check_distinct(list_of_var_ids)){
+		return _ret;
+	}
+
+
+	//Check for similarity of the method name.
+	list_method_nodes = n.f6.nodes;
+	Iterator _itr2 = list_method_nodes.iterator();
+	MethodDeclaration temp_method;
+	while(_itr2.hasNext()){
+		temp_method = _itr2.next();
+		list_of_methods_ids.add(temp_method.f2.f0.toString());
+	}
+	if(!Helper_Functions.check_distinct(list_of_method_ids)){
+		return _ret;
+	}
+
+	//LOOP over the methods again and get the values of noOverloading
+	
+
+
 	check_method = n.f6.accept(this, argu);
 	method_id_name = Helper_Functions.get_methodname(n.f6.elementAt(0));
 	n.f7.accept(this, argu);

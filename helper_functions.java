@@ -19,7 +19,12 @@ public class Helper_Functions{
   public String get_methodname(MethodDeclaration n0){
       return n0.f2.f0.toString();
   }
-
+  public boolean check_success(Vector<String> statement_ID){
+      if(statement_ID.contains("FALSE")){
+          return false;
+      }
+      return true;
+  }
   public boolean check_distinct(Vector<String> List_ID){
       //Create a copy of the vector of nodes.
       Vector<String> temp_vec;
@@ -31,14 +36,14 @@ public class Helper_Functions{
       while(temp_vec.size() != 0){
           temp_str = node_placer.lastElement();
           temp_vec.remove(temp_vec.size() - 1);
-          if(temp_vec.contains(temp_str) || temp_vec.size() == 0) {
+          if(temp_vec.size() == 0 || temp_vec.contains(temp_str)) {
               break;
           }
       }
       if(temp_vec.size() == 0){
-        return false;
-      }else{
         return true;
+      }else{
+        return false;
       }
   }
   //Given that NodeListOptional in a Class Declaration. extract the type environment
