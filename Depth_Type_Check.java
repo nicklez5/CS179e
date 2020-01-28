@@ -9,18 +9,30 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	public int primary_exp_number;
 	public boolean store_assign;
 	public String empty_id;
+
+	public Vector<Scope_Check> class_sym;
 	public Depth_Type_Check(){
 		primary_exp_number = 0;
 		store_assign = 0;
 		empty_id = "";
+
 		sym_table = new Scope_Check();
+		class_sym = new Vector<Scope_Check>();
 
 	}
 
+	/**
+		* f0 - MainClass()
+		  f1 - typedeclaration_choice
+			f2 - EOF
+		*/
 	public void visit(Goal n) {
 		 n.f0.accept(this);
 		 n.f1.accept(this);
 		 n.f2.accept(this);
+
+		 //The last class if there is any.
+
 	}
 
 	/**
@@ -44,8 +56,11 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f17 -> "}"
 	 */
 	public void visit(MainClass n) {
+		 String class_name;
 		 n.f0.accept(this);
 		 n.f1.accept(this);
+		 class_name = n.f1.id_value;
+		 sym_table.class_name_id =  class_name;
 		 n.f2.accept(this);
 		 n.f3.accept(this);
 		 n.f4.accept(this);
@@ -62,6 +77,7 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f15.accept(this);
 		 n.f16.accept(this);
 		 n.f17.accept(this);
+		 class_sym.add(sym_table);
 	}
 
 	/**
@@ -69,7 +85,9 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 *       | ClassExtendsDeclaration()
 	 */
 	public void visit(TypeDeclaration n) {
-		 n.f0.accept(this);
+		sym_table = new Scope_Check();
+		n.f0.accept(this);
+
 	}
 
 	/**
@@ -83,10 +101,12 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	public void visit(ClassDeclaration n) {
 		 n.f0.accept(this);
 		 n.f1.accept(this);
+		 sym_table.class_name_id = n.f1.id_value;
 		 n.f2.accept(this);
 		 n.f3.accept(this);
 		 n.f4.accept(this);
 		 n.f5.accept(this);
+		 class_sym.add(sym_table);
 	}
 
 	/**
@@ -102,12 +122,14 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	public void visit(ClassExtendsDeclaration n) {
 		 n.f0.accept(this);
 		 n.f1.accept(this);
+		 sym_table.class_name_id = n.f1.id_value;
 		 n.f2.accept(this);
 		 n.f3.accept(this);
 		 n.f4.accept(this);
 		 n.f5.accept(this);
 		 n.f6.accept(this);
 		 n.f7.accept(this);
+		 class_sym.add(sym_table);
 	}
 
 	/**
@@ -149,6 +171,9 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f0.accept(this);
 		 n.f1.accept(this);
 		 n.f2.accept(this);
+		 if(!sym_table.containsKey(n.f2.id_value)){
+			 sym_table.add_me(n.f2.id_value,Helper_Functions.return_type(n.f1.type_choice));
+		 }
 		 n.f3.accept(this);
 		 n.f4.accept(this);
 		 n.f5.accept(this);
@@ -177,7 +202,9 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	public void visit(FormalParameter n) {
 		 n.f0.accept(this);
 		 n.f1.accept(this);
-		 sym_table.add_me(n.f1.id_value, Helper_Functions.return_type(n.f0.type_choice));
+		 if(!sym_table.containsKey(n.f1.id_value)){
+			 sym_table.add_me(n.f1.id_value, Helper_Functions.return_type(n.f0.type_choice));
+		 }
 	}
 
 	/**
@@ -574,6 +601,7 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f1.accept(this);
 		 n.f2.accept(this);
 		 n.f3.accept(this);
+
 		 n.f4.accept(this);
 	}
 
