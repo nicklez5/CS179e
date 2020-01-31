@@ -120,17 +120,19 @@ public class Helper_Functions{
         }
     }
     public boolean noOverloading(String class_id, String class_super_id, String method_name_id){
-        String method_type;
-        String method_type_P;
-        method_type = methodtype(class_id,method_name_id);
-        method_type_P = methodtype(class_super_id, method_name_id);
-        if(method_type.isEmpty() || method_type_P.isEmpty()){
-            return false;
-        }else if(method_type.equals(method_type_P)){
-            return true;
-        }else{
+        Vector<String> method_vec_super = new Vector<String>();
+        Vector<String> method_vec = new Vector<String>();
+        method_vec= method_type(class_id,method_name_id);
+        method_vec_super = method_type(class_super_id, method_name_id);
+        if(method_vec.size() != method_vec_super.size()){
             return false;
         }
+        for(int i = 0; i < method_vec.size();i++){
+            if(!method_vec.elementAt(i).equals(method_vec_super.elementAt(i))){
+                return false;
+            }
+        }
+        return true;
     }
     public void print_function(Vector<String> xyz){
         Enumeration enu = xyz.elements();

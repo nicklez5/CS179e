@@ -14,14 +14,14 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	public Helper_Functions helper1;
 	public Vector<Scope_Check> class_sym;
 	public Depth_Type_Check(){
-		this.primary_exp_number = 0;
-		this.store_assign = false;
-		this.empty_id = "";
-		this.helper1 = new Helper_Functions();
-		this.class_sym = new Vector<Scope_Check>();
-		this.sym_table = new Scope_Check();
-		this.current_type = "";
-		this.current_method_name = "";
+		primary_exp_number = 0;
+		store_assign = false;
+		empty_id = "";
+		helper1 = new Helper_Functions();
+		class_sym = new Vector<Scope_Check>();
+		sym_table = new Scope_Check();
+		current_type = "";
+		current_method_name = "";
 		//this.helper1 = new Helper_Functions();
 	}
 
@@ -33,10 +33,11 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	public void visit(Goal n) {
 		 this.visit(n.f0);
 		 Vector<Node> temp_nodes = n.f1.nodes;
+
 		 Iterator _itr = temp_nodes.iterator();
-		 TypeDeclaration temp_declare = new TypeDeclaration();
 		 while(_itr.hasNext()){
-			 temp_declare = (TypeDeclaration)_itr.next();
+
+			 TypeDeclaration temp_declare = (TypeDeclaration)_itr.next();
 			 this.visit(temp_declare);
 		 }
 		 n.f2.accept(this);
@@ -110,8 +111,7 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 
 
 		if(n.f0.which == 0){
-			ClassDeclaration temp_class_declare;
-			temp_class_declare = (ClassDeclaration)n.f0.choice;
+			ClassDeclaration temp_class_declare = (ClassDeclaration)n.f0.choice;
 			this.visit(temp_class_declare);
 		}else{
 			ClassExtendsDeclaration temp_ext_class_declare;
@@ -141,7 +141,7 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 			 VarDeclaration temp_var = (VarDeclaration)_itr.next();
 			 this.visit(temp_var);
 		 }
-		 temp_nodes.clear();
+		 //temp_nodes.clear();
 		 temp_nodes = n.f4.nodes;
 		 _itr = temp_nodes.iterator();
 		 while(_itr.hasNext()){

@@ -31,16 +31,14 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 	public static void main (String[] args){
 		Goal holy_goal;
 		String boolean_value_goal;
+		MiniJavaParser xyz = new MiniJavaParser(System.in);
+		Depth_Type_Check sym_check = new Depth_Type_Check();
 		try{
-			MiniJavaParser xyz = new MiniJavaParser(System.in);
 			holy_goal = xyz.Goal();
-			Depth_Type_Check sym_check = new Depth_Type_Check();
-
 			//Missing an argument
 			holy_goal.accept(sym_check);
 
 			/*Printing all the data calculated from Depth_Type_Check
-
 			Iterator _itr = sym_check.class_sym.iterator();
 	        Scope_Check temp_table;
 	        while(_itr.hasNext()){
@@ -58,7 +56,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 			}else{
 				System.out.println("Type error");
 			}
-		
+
 		} catch (ParseException e){
 			System.out.println("Type error");
 		}
