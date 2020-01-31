@@ -223,9 +223,12 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 //System.out.println(n.f2.id_value);
 		 current_method_name = n.f2.id_value;
 		 sym_table.add_method_type(current_method_name,method_return_type);
-		 FormalParameterList temp_formal_parameter_list;
-		 temp_formal_parameter_list = (FormalParameterList)n.f4.node;
-		 this.visit(temp_formal_parameter_list);
+		 if(n.f4.node != null){
+			 FormalParameterList temp_formal_parameter_list;
+			 temp_formal_parameter_list = (FormalParameterList)n.f4.node;
+			 this.visit(temp_formal_parameter_list);
+		 }
+
 
 		 n.f6.accept(this);
 		 n.f7.accept(this);
@@ -241,10 +244,12 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f1 -> ( FormalParameterRest() )*
 	 */
 	public void visit(FormalParameterList n) {
-		 this.visit(n.f0);
+		 FormalParameter temp_formal = n.f0;
+		 this.visit(temp_formal);
 
 		 Vector<Node> temp_nodes;
 		 temp_nodes = n.f1.nodes;
+
 		 Iterator _itr = temp_nodes.iterator();
 		 while(_itr.hasNext()){
 			 FormalParameterRest temp_formal_parameter_rest = (FormalParameterRest)_itr.next();

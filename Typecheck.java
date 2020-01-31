@@ -14,6 +14,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 	public Helper_Functions help_me;
 	public String current_method;
 	public String temp_method_classname;
+	public Vector<String> class_name_vec;
 	public Typecheck(){
 		 current_method = "";
 
@@ -26,14 +27,16 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		help_me = new Helper_Functions(current_class_sym);
 		current_method = "";
 		temp_method_classname = "";
+		class_name_vec = new Vector<String>();
 	}
 	//Automatically runs
 	public static void main (String[] args){
 		Goal holy_goal;
 		String boolean_value_goal;
-		MiniJavaParser xyz = new MiniJavaParser(System.in);
-		Depth_Type_Check sym_check = new Depth_Type_Check();
+
 		try{
+			MiniJavaParser xyz = new MiniJavaParser(System.in);
+			Depth_Type_Check sym_check = new Depth_Type_Check();
 			holy_goal = xyz.Goal();
 			//Missing an argument
 			holy_goal.accept(sym_check);
@@ -79,12 +82,12 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		String str_1 = "";
 
 		String true_value = "TRUE";
-		Vector<String> class_title = new Vector<String>();
+
 
 		//Main Class
 		str_1 = this.visit(n.f0,1);
 
-		class_title.add(current_sym_table.class_name_id);
+		class_name_vec.add(current_sym_table.class_name_id);
 		//help_me.print_function(class_title);
 
 		//Type Declaration
@@ -93,23 +96,15 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		//Check for distinct
 		Vector<Node> temp_nodes = n.f1.nodes;
 		Iterator temp_itr = temp_nodes.iterator();
-		TypeDeclaration temp_type;
-		ClassDeclaration temp_class_declare;
-		ClassExtendsDeclaration temp_ext_class_declare;
 
 		while(temp_itr.hasNext()){
-			temp_type = (TypeDeclaration)temp_itr.next();
-			if(temp_type.f0.which == 0){
-				temp_class_declare = (ClassDeclaration)temp_type.f0.choice;
-				class_title.add(temp_class_declare.f1.id_value);
-			}else if(temp_type.f0.which == 1){
-				temp_ext_class_declare = (ClassExtendsDeclaration)temp_type.f0.choice;
-				class_title.add(temp_ext_class_declare.f1.id_value);
-			}
+			TypeDeclaration temp_type = (TypeDeclaration)temp_itr.next();
+			this.visit(temp_type,1);
+
 		}
 		//help_me.print_function(class_title);
 		n.f2.accept(this, argu);
-		if(!help_me.check_distinct(class_title)){
+		if(!help_me.check_distinct(class_name_vec)){
 			return "FALSE";
 		}
 		if(!str_1.equals("TRUE")){
@@ -155,7 +150,6 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		boolean class_found = false;
 		n.f1.accept(this, argu);
 		class_name = n.f1.f0.toString();
-
 		Iterator _it = current_class_sym.iterator();
 		while(_it.hasNext()){
 			current_sym_table = (Scope_Check)_it.next();
@@ -225,8 +219,20 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 	*       | ClassExtendsDeclaration()
 	*/
 	public String visit(TypeDeclaration n, int argu){
-		String _ret;
-		_ret = n.f0.accept(this, argu);
+
+		String _ret = "";
+		if(n.f0.which == 0){
+			ClassDeclaration temp_class;
+			temp_class = (ClassDeclaration)n.f0.choice;
+			_ret = this.visit(temp_class,1);
+			class_name_vec.add(temp_class.f1.f0.toString());
+		}else if(n.f0.which == 1){
+			ClassExtendsDeclaration temp_ext_class;
+			temp_ext_class = (ClassExtendsDeclaration)n.f0.choice;
+			_ret = this.visit(temp_ext_class,1);
+			class_name_vec.add(temp_ext_class.f1.f0.toString());
+		}
+
 		return _ret;
 	}
 
@@ -422,7 +428,8 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		//CHeck on distinct id's on var Declaration
 		//Get the fields
 		//Check for the statement trueness
-		//Check that expresion is the correct return type.
+		//Check that expresion is the correct return type
+
 		String _ret = "FALSE";
 		String exp_id;
 		String method_id;
@@ -673,6 +680,9 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		String str_2;
 
 		temp_id = n.f0.f0.toString();
+		if(!current_sym_table.check_id(temp_id)){
+			return _ret;
+		}
 		n.f1.accept(this, argu);
 
 		str_2 = this.visit(n.f2,1);
@@ -1017,19 +1027,31 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		//check f4
 		current_method = n.f2.f0.toString();
 
-		ExpressionList random_exp_list = (ExpressionList)n.f4.node;
-		_ret = this.visit(random_exp_list,1);
-		if(_ret.equals("TRUE")){
+		if(n.f4.node != null){
+			ExpressionList random_exp_list = (ExpressionList)n.f4.node;
+			_ret = this.visit(random_exp_list,1);
+			if(_ret.equals("TRUE")){
+				Iterator _itr = current_class_sym.iterator();
+				while(_itr.hasNext()){
+					Scope_Check temp_scope_chk = (Scope_Check)_itr.next();
+					if(temp_scope_chk.class_name_id.equals(class_id_name)){
+						method_return_type1 = temp_scope_chk.return_method_type(current_method);
+
+						return method_return_type1;
+					}
+				}
+			}
+		}else{
 			Iterator _itr = current_class_sym.iterator();
 			while(_itr.hasNext()){
 				Scope_Check temp_scope_chk = (Scope_Check)_itr.next();
 				if(temp_scope_chk.class_name_id.equals(class_id_name)){
 					method_return_type1 = temp_scope_chk.return_method_type(current_method);
-
 					return method_return_type1;
 				}
 			}
 		}
+
 		n.f5.accept(this, argu);
 
 
