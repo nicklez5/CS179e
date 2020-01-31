@@ -1,7 +1,7 @@
+
 import syntaxtree.*;
 import visitor.*;
 import java.util.*;
-import static packagename.Constants.*;
 
 public class Depth_Type_Check extends DepthFirstVisitor  {
 
@@ -9,16 +9,20 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	public int primary_exp_number;
 	public boolean store_assign;
 	public String empty_id;
-
+	public String current_type;
+	public String current_method_name;
+	public Helper_Functions helper1;
 	public Vector<Scope_Check> class_sym;
 	public Depth_Type_Check(){
-		primary_exp_number = 0;
-		store_assign = 0;
-		empty_id = "";
-
-		sym_table = new Scope_Check();
-		class_sym = new Vector<Scope_Check>();
-
+		this.primary_exp_number = 0;
+		this.store_assign = false;
+		this.empty_id = "";
+		this.helper1 = new Helper_Functions();
+		this.class_sym = new Vector<Scope_Check>();
+		this.sym_table = new Scope_Check();
+		this.current_type = "";
+		this.current_method_name = "";
+		//this.helper1 = new Helper_Functions();
 	}
 
 	/**
@@ -27,11 +31,26 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 			f2 - EOF
 		*/
 	public void visit(Goal n) {
-		 n.f0.accept(this);
-		 n.f1.accept(this);
+		 this.visit(n.f0);
+		 Vector<Node> temp_nodes = n.f1.nodes;
+		 Iterator _itr = temp_nodes.iterator();
+		 TypeDeclaration temp_declare = new TypeDeclaration();
+		 while(_itr.hasNext()){
+			 temp_declare = (TypeDeclaration)_itr.next();
+			 this.visit(temp_declare);
+		 }
 		 n.f2.accept(this);
 
+		 /*
+		 _itr = class_sym.iterator();
+		 Scope_Check temp_table;
+		 while(_itr.hasNext()){
+			 temp_table = (Scope_Check)_itr.next();
+			 System.out.println(temp_table.class_name_id);
+			 temp_table.print_map();
 		 //The last class if there is any.
+	 	 }
+		 */
 
 	}
 
@@ -60,7 +79,9 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f0.accept(this);
 		 n.f1.accept(this);
 		 class_name = n.f1.id_value;
+		 //System.out.println(class_name);
 		 sym_table.class_name_id =  class_name;
+		 class_sym.add(sym_table);
 		 n.f2.accept(this);
 		 n.f3.accept(this);
 		 n.f4.accept(this);
@@ -77,7 +98,6 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f15.accept(this);
 		 n.f16.accept(this);
 		 n.f17.accept(this);
-		 class_sym.add(sym_table);
 	}
 
 	/**
@@ -85,8 +105,21 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 *       | ClassExtendsDeclaration()
 	 */
 	public void visit(TypeDeclaration n) {
-		sym_table = new Scope_Check();
-		n.f0.accept(this);
+		Scope_Check new_scope_check = new Scope_Check();
+		sym_table = new_scope_check;
+
+
+		if(n.f0.which == 0){
+			ClassDeclaration temp_class_declare;
+			temp_class_declare = (ClassDeclaration)n.f0.choice;
+			this.visit(temp_class_declare);
+		}else{
+			ClassExtendsDeclaration temp_ext_class_declare;
+			temp_ext_class_declare = (ClassExtendsDeclaration)n.f0.choice;
+			this.visit(temp_ext_class_declare);
+
+		}
+
 
 	}
 
@@ -99,14 +132,24 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f5 -> "}"
 	 */
 	public void visit(ClassDeclaration n) {
-		 n.f0.accept(this);
-		 n.f1.accept(this);
 		 sym_table.class_name_id = n.f1.id_value;
-		 n.f2.accept(this);
-		 n.f3.accept(this);
-		 n.f4.accept(this);
-		 n.f5.accept(this);
+
+		 Vector<Node> temp_nodes;
+		 temp_nodes = n.f3.nodes;
+		 Iterator _itr = temp_nodes.iterator();
+		 while(_itr.hasNext()){
+			 VarDeclaration temp_var = (VarDeclaration)_itr.next();
+			 this.visit(temp_var);
+		 }
+		 temp_nodes.clear();
+		 temp_nodes = n.f4.nodes;
+		 _itr = temp_nodes.iterator();
+		 while(_itr.hasNext()){
+			 MethodDeclaration temp_method = (MethodDeclaration)_itr.next();
+			 this.visit(temp_method);
+		 }
 		 class_sym.add(sym_table);
+
 	}
 
 	/**
@@ -120,16 +163,25 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f7 -> "}"
 	 */
 	public void visit(ClassExtendsDeclaration n) {
-		 n.f0.accept(this);
-		 n.f1.accept(this);
 		 sym_table.class_name_id = n.f1.id_value;
-		 n.f2.accept(this);
-		 n.f3.accept(this);
-		 n.f4.accept(this);
-		 n.f5.accept(this);
-		 n.f6.accept(this);
-		 n.f7.accept(this);
-		 class_sym.add(sym_table);
+
+		Vector<Node> temp_nodes;
+		temp_nodes = n.f5.nodes;
+		Iterator _itr = temp_nodes.iterator();
+		while(_itr.hasNext()){
+			VarDeclaration temp_var = (VarDeclaration)_itr.next();
+			this.visit(temp_var);
+		}
+
+		temp_nodes.clear();
+		temp_nodes = n.f6.nodes;
+		_itr = temp_nodes.iterator();
+		while(_itr.hasNext()){
+			MethodDeclaration temp_method = (MethodDeclaration)_itr.next();
+			this.visit(temp_method);
+		}
+		class_sym.add(sym_table);
+
 	}
 
 	/**
@@ -139,15 +191,11 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 */
 	public void visit(VarDeclaration n) {
 		 String id_name;
-		 n.f0.accept(this);
-		 n.f1.accept(this);
-
-		 id_name = n.f1.id_value;
+		 this.visit(n.f0);
+		 id_name = n.f1.f0.toString();
 
 		 //Check if a map contains this key
-		 if(!sym_table.containsKey(id_name)){
-			 sym_table.add_me(id_name,Helper_Functions.return_type(n.f0.type_choice));
-		 }
+		sym_table.add_me(id_name,this.current_type);
 
 		 n.f2.accept(this);
 	}
@@ -169,14 +217,16 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 */
 	public void visit(MethodDeclaration n) {
 		 n.f0.accept(this);
-		 n.f1.accept(this);
+		 this.visit(n.f1);
+		 String method_return_type = current_type;
 		 n.f2.accept(this);
-		 if(!sym_table.containsKey(n.f2.id_value)){
-			 sym_table.add_me(n.f2.id_value,Helper_Functions.return_type(n.f1.type_choice));
-		 }
-		 n.f3.accept(this);
-		 n.f4.accept(this);
-		 n.f5.accept(this);
+		 //System.out.println(n.f2.id_value);
+		 current_method_name = n.f2.id_value;
+		 sym_table.add_method_type(current_method_name,method_return_type);
+		 FormalParameterList temp_formal_parameter_list;
+		 temp_formal_parameter_list = (FormalParameterList)n.f4.node;
+		 this.visit(temp_formal_parameter_list);
+
 		 n.f6.accept(this);
 		 n.f7.accept(this);
 		 n.f8.accept(this);
@@ -191,8 +241,16 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f1 -> ( FormalParameterRest() )*
 	 */
 	public void visit(FormalParameterList n) {
-		 n.f0.accept(this);
-		 n.f1.accept(this);
+		 this.visit(n.f0);
+
+		 Vector<Node> temp_nodes;
+		 temp_nodes = n.f1.nodes;
+		 Iterator _itr = temp_nodes.iterator();
+		 while(_itr.hasNext()){
+			 FormalParameterRest temp_formal_parameter_rest = (FormalParameterRest)_itr.next();
+			 this.visit(temp_formal_parameter_rest);
+		 }
+
 	}
 
 	/**
@@ -200,11 +258,8 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f1 -> Identifier()
 	 */
 	public void visit(FormalParameter n) {
-		 n.f0.accept(this);
-		 n.f1.accept(this);
-		 if(!sym_table.containsKey(n.f1.id_value)){
-			 sym_table.add_me(n.f1.id_value, Helper_Functions.return_type(n.f0.type_choice));
-		 }
+		 this.visit(n.f0);
+		 sym_table.add_method(current_method_name, this.current_type);
 	}
 
 	/**
@@ -213,7 +268,7 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 */
 	public void visit(FormalParameterRest n) {
 		 n.f0.accept(this);
-		 n.f1.accept(this);
+		 this.visit(n.f1);
 	}
 
 	/**
@@ -223,7 +278,15 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 *       | Identifier()
 	 */
 	public void visit(Type n) {
-		 n.f0.accept(this);
+		 if(n.f0.which == 0){
+			 this.current_type = "ARRAY";
+		 }else if(n.f0.which == 1){
+			 this.current_type = "BOOL";
+		 }else if(n.f0.which == 2){
+			 this.current_type = "INT";
+		 }else if(n.f0.which == 3){
+			 this.current_type = "ID";
+		 }
 	}
 
 	/**
@@ -260,7 +323,32 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 *       | PrintStatement()
 	 */
 	public void visit(Statement n) {
-		 n.f0.accept(this);
+		if(n.f0.which == 0){
+			Block temp_blk;
+			temp_blk = (Block)n.f0.choice;
+			this.visit(temp_blk);
+		}else if(n.f0.which == 1){
+			AssignmentStatement temp_assign;
+			temp_assign = (AssignmentStatement)n.f0.choice;
+			this.visit(temp_assign);
+		}else if(n.f0.which == 2){
+			ArrayAssignmentStatement temp_arry_assign;
+			temp_arry_assign = (ArrayAssignmentStatement)n.f0.choice;
+			this.visit(temp_arry_assign);
+		}else if(n.f0.which == 3){
+			IfStatement temp_if;
+			temp_if = (IfStatement)n.f0.choice;
+			this.visit(temp_if);
+		}else if(n.f0.which == 4){
+			WhileStatement temp_while;
+			temp_while = (WhileStatement)n.f0.choice;
+			this.visit(temp_while);
+		}else if(n.f0.which == 5){
+			PrintStatement temp_print;
+			temp_print = (PrintStatement)n.f0.choice;
+			this.visit(temp_print);
+		}
+
 	}
 
 	/**
@@ -269,9 +357,13 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f2 -> "}"
 	 */
 	public void visit(Block n) {
-		 n.f0.accept(this);
-		 n.f1.accept(this);
-		 n.f2.accept(this);
+		Vector<Node> temp_nodes;
+		temp_nodes = n.f1.nodes;
+		Iterator _itr = temp_nodes.iterator();
+		while(_itr.hasNext()){
+			Statement temp_statement = (Statement)_itr.next();
+			this.visit(temp_statement);
+		}
 	}
 
 	/**
@@ -281,11 +373,10 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f3 -> ";"
 	 */
 	public void visit(AssignmentStatement n) {
-		 n.f0.accept(this);
+
 		 empty_id = n.f0.id_value;
-		 n.f1.accept(this);
-		 n.f2.accept(this);
-		 n.f3.accept(this);
+
+		 this.visit(n.f2);
 	}
 
 	/**
@@ -298,6 +389,7 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f6 -> ";"
 	 */
 	public void visit(ArrayAssignmentStatement n) {
+
 		 n.f0.accept(this);
 		 n.f1.accept(this);
 		 n.f2.accept(this);
@@ -368,7 +460,12 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 *       | PrimaryExpression()
 	 */
 	public void visit(Expression n) {
-		 n.f0.accept(this);
+
+		 if(n.f0.which == 8){
+			 	PrimaryExpression temp_prim_exp;
+				temp_prim_exp = (PrimaryExpression)n.f0.choice;
+				this.visit(temp_prim_exp);
+		 }
 	}
 
 	/**
@@ -382,13 +479,7 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f1.accept(this);
 		 n.f2.accept(this);
 
-		 /*
-		 String xyz = "p" + primary_exp_number;
-		 primary_exp_number++;
-		 xyz = xyz.concat(" " + n.f1.toString() + " " + "p" + Integer.toString(primary_exp_number));
-		 sym_table.add_me(xyz,BOOL_TYPE);
-		 primary_exp_number++;
-		 */
+
 	}
 
 	/**
@@ -402,13 +493,6 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f1.accept(this);
 		 n.f2.accept(this);
 
-		 /*
-		 String xyz = "p" + primary_exp_number;
-		 primary_exp_number++;
-		 xyz = xyz.concat(" " + n.f1.toString() + " " + "p" + Integer.toString(primary_exp_number));
-		 sym_table.add_me(xyz,BOOL_TYPE);
-		 primary_exp_number++;
-		 */
 
 	}
 
@@ -424,13 +508,6 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f1.accept(this);
 		 n.f2.accept(this);
 
-		 /*
-		 String xyz = "p" + primary_exp_number;
-		 primary_exp_number++;
-		 xyz = xyz.concat(" " + n.f1.toString() + " " + "p" + Integer.toString(primary_exp_number));
-		 sym_table.add_me(xyz,INT_TYPE);
-		 primary_exp_number++;
-		 */
 
 	}
 
@@ -445,13 +522,6 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f1.accept(this);
 		 n.f2.accept(this);
 
-		 /*
-		 String xyz = "p" + primary_exp_number;
-		 primary_exp_number++;
-		 xyz = xyz.concat(" " + n.f1.toString() + " " + "p" + Integer.toString(primary_exp_number));
-		 sym_table.add_me(xyz,INT_TYPE);
-		 primary_exp_number++;
-		 */
 	}
 
 	/**
@@ -465,13 +535,6 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f1.accept(this);
 		 n.f2.accept(this);
 
-		 /*
-		 String xyz = "p" + primary_exp_number;
-		 primary_exp_number++;
-		 xyz = xyz.concat(" " + n.f1.toString() + " " + "p" + Integer.toString(primary_exp_number));
-		 sym_table.add_me(xyz,INT_TYPE);
-		 primary_exp_number++;
-		 */
 	}
 
 	/**
@@ -548,10 +611,11 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 *       | BracketExpression()
 	 */
 	public void visit(PrimaryExpression n) {
-		if(n.f0.primaryexpression_choice == 6){
-			store_assign = 1;
+
+		if(n.f0.which == 6){
+			AllocationExpression temp_allocate = (AllocationExpression)n.f0.choice;
+			this.visit(temp_allocate);
 		}
-		 n.f0.accept(this);
 	}
 
 	/**
@@ -612,16 +676,12 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f3 -> ")"
 	 */
 	public void visit(AllocationExpression n) {
-		 n.f0.accept(this);
-		 n.f1.accept(this);
-		 if(store_assign == 1){
-			 String xyz = n.f1.id_value;
-			 sym_table.add_me(empty_id,xyz);
-			 store_assign = 0;
-		 }
+		String xyz = n.f1.id_value;
+		sym_table.add_me(empty_id,xyz);
 
-		 n.f2.accept(this);
-		 n.f3.accept(this);
+
+
+
 	}
 
 	/**

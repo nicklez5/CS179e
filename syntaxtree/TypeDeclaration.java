@@ -12,9 +12,16 @@ package syntaxtree;
 public class TypeDeclaration implements Node {
    public NodeChoice f0;
    public int typedeclaration_choice;
+   public TypeDeclaration(){
+
+   }
+   public TypeDeclaration(TypeDeclaration xyz_1){
+       f0 = xyz_1.f0;
+       typedeclaration_choice = xyz_1.typedeclaration_choice;
+   }
    public TypeDeclaration(NodeChoice n0) {
       f0 = n0;
-      typedeclaration_choice = n0.whichChoice;
+      typedeclaration_choice = n0.which;
    }
 
    public void accept(visitor.Visitor v) {

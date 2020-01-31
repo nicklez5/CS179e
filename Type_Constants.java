@@ -1,3 +1,4 @@
+
 public class Type_Constants{
   public static class Type_Constants_Capability{
     public final static int ARRAY_TYPE = 0;

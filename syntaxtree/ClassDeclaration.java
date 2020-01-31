@@ -20,7 +20,7 @@ public class ClassDeclaration implements Node {
    public NodeListOptional f3;
    public NodeListOptional f4;
    public NodeToken f5;
-
+   
    public ClassDeclaration(NodeToken n0, Identifier n1, NodeToken n2, NodeListOptional n3, NodeListOptional n4, NodeToken n5) {
       f0 = n0;
       f1 = n1;

@@ -67,6 +67,7 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
     * f2 -> <EOF>
     */
    public R visit(Goal n, A argu) {
+
       R _ret=null;
       n.f0.accept(this, argu);
       /*
@@ -98,7 +99,8 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
     * f17 -> "}"
     */
    public R visit(MainClass n, A argu) {
-      R _ret=null;
+      R _ret = null;
+
       n.f0.accept(this, argu);
       n.f1.accept(this, argu);
       n.f2.accept(this, argu);

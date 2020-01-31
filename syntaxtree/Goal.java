@@ -30,6 +30,7 @@ public class Goal implements Node {
    public void accept(visitor.Visitor v) {
       v.visit(this);
    }
+
    public <R,A> R accept(visitor.GJVisitor<R,A> v, A argu) {
       return v.visit(this,argu);
    }
@@ -40,4 +41,3 @@ public class Goal implements Node {
       v.visit(this,argu);
    }
 }
-

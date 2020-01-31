@@ -1,44 +1,68 @@
+
 import syntaxtree.*;
 import visitor.*;
 import java.util.*;
 
-import static packagename.Constants.*;
 
-class TypeCheck extends GJDepthFirst<String, Int>  {
+
+
+public class Typecheck extends GJDepthFirst<String,Integer>{
 
 
 	public Scope_Check current_sym_table;
 	public Vector<Scope_Check> current_class_sym;
-
-
-	public TypeCheck(){
+	public Helper_Functions help_me;
+	public String current_method;
+	public String temp_method_classname;
+	public Typecheck(){
+		 current_method = "";
 
 	}
 
 
-	public TypeCheck(Depth_Type_Check regular_check){
+	public Typecheck(Depth_Type_Check regular_check){
 		current_sym_table = regular_check.sym_table;
 		current_class_sym = regular_check.class_sym;
+		help_me = new Helper_Functions(current_class_sym);
+		current_method = "";
+		temp_method_classname = "";
 	}
 	//Automatically runs
 	public static void main (String[] args){
-
 		Goal holy_goal;
 		String boolean_value_goal;
-		MiniJavaParser xyz = new MiniJavaParser(System.in);
-		holy_goal = xyz.goal();
-		Depth_Type_Check sym_check = new Depth_Type_Check();
-		TypeCheck test_me = new TypeCheck(sym_check);
+		try{
+			MiniJavaParser xyz = new MiniJavaParser(System.in);
+			holy_goal = xyz.Goal();
+			Depth_Type_Check sym_check = new Depth_Type_Check();
 
-		//Missing an argument
-		holy_goal.accept(sym_check);
-		holy_goal.accept(test_me,1);
-		boolean_value_goal = visit(holy_goal,1);
-		if(boolean_value_goal.equals("TRUE")){
-			System.out.println("Program type checked successfully");
-		}else{
+			//Missing an argument
+			holy_goal.accept(sym_check);
+
+			/*Printing all the data calculated from Depth_Type_Check
+
+			Iterator _itr = sym_check.class_sym.iterator();
+	        Scope_Check temp_table;
+	        while(_itr.hasNext()){
+	            temp_table = (Scope_Check)_itr.next();
+	            System.out.println(temp_table.class_name_id);
+	        }
+			*/
+
+			Typecheck test_me = new Typecheck(sym_check);
+			holy_goal.accept(test_me,1);
+
+			boolean_value_goal = test_me.visit(holy_goal,1);
+			if(boolean_value_goal.equals("TRUE")){
+				System.out.println("Program type checked successfully");
+			}else{
+				System.out.println("Type error");
+			}
+		
+		} catch (ParseException e){
 			System.out.println("Type error");
 		}
+
 
 
 
@@ -52,16 +76,18 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	f1 - (typedeclaration_choice) *
 	f2 - EOF
 	*/
-	public String visit(Goal n, Int argu){
+	public String visit(Goal n, int argu){
 		String ret_1 = "TRUE";
-		String str_1;
+		String str_1 = "";
 
 		String true_value = "TRUE";
 		Vector<String> class_title = new Vector<String>();
 
 		//Main Class
-		str_1 = n.f0.accept(this, argu);
+		str_1 = this.visit(n.f0,1);
+
 		class_title.add(current_sym_table.class_name_id);
+		//help_me.print_function(class_title);
 
 		//Type Declaration
 		n.f1.accept(this, argu);
@@ -74,17 +100,18 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 		ClassExtendsDeclaration temp_ext_class_declare;
 
 		while(temp_itr.hasNext()){
-			temp_type = temp_itr.next();
+			temp_type = (TypeDeclaration)temp_itr.next();
 			if(temp_type.f0.which == 0){
-				temp_class_declare = temp_type.f0.choice;
+				temp_class_declare = (ClassDeclaration)temp_type.f0.choice;
 				class_title.add(temp_class_declare.f1.id_value);
 			}else if(temp_type.f0.which == 1){
-				temp_ext_class_declare = temp_type.f0.choice;
+				temp_ext_class_declare = (ClassExtendsDeclaration)temp_type.f0.choice;
 				class_title.add(temp_ext_class_declare.f1.id_value);
 			}
 		}
+		//help_me.print_function(class_title);
 		n.f2.accept(this, argu);
-		if(!Helper_Functions.check_distinct(class_title)){
+		if(!help_me.check_distinct(class_title)){
 			return "FALSE";
 		}
 		if(!str_1.equals("TRUE")){
@@ -114,9 +141,11 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f16 -> "}"
 	* f17 -> "}"
 	*/
-	public String visit(MainClass n, Int argu){
+
+	public String visit(MainClass n, int argu){
 		String _ret = "FALSE";
 		String class_name;
+
 
 		n.f0.accept(this, argu);
 
@@ -128,9 +157,11 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 		boolean class_found = false;
 		n.f1.accept(this, argu);
 		class_name = n.f1.f0.toString();
+
 		Iterator _it = current_class_sym.iterator();
 		while(_it.hasNext()){
-			current_sym_table = _it.next();
+			current_sym_table = (Scope_Check)_it.next();
+			//System.out.println(current_sym_table.class_name_id);
 			if(current_sym_table.class_name_id.equals(class_name)){
 				class_found = true;
 				break;
@@ -160,12 +191,14 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 		Iterator _itr = temp_node_var.iterator();
 		VarDeclaration temp_random_var;
 		while(_itr.hasNext()){
-			temp_random_var = _itr.next();
+			temp_random_var = (VarDeclaration)_itr.next();
 			temp_variables.add(temp_random_var.f1.f0.toString());
 		}
 		//If all failed return fail
-		if(!Helper_Functions.check_distinct(temp_variables)){
-			return _ret;
+		if(!temp_variables.isEmpty()){
+			if(!help_me.check_distinct(temp_variables)){
+				return _ret;
+			}
 		}
 
 		//Check for success in Statements
@@ -174,10 +207,11 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 		_itr = temp_node_var.iterator();
 		Statement temp_statement;
 		while(_itr.hasNext()){
-			temp_statement = _itr.next();
+			temp_statement = (Statement)_itr.next();
 			temp_statement_variables.add(this.visit(temp_statement,1));
 		}
-		if(!Helper_Functions.check_success(temp_statement_variables)){
+		if(!help_me.check_success(temp_statement_variables)){
+			System.out.println("I died here");
 			return _ret;
 		}
 
@@ -192,7 +226,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f0 -> ClassDeclaration()
 	*       | ClassExtendsDeclaration()
 	*/
-	public String visit(TypeDeclaration n, Int argu){
+	public String visit(TypeDeclaration n, int argu){
 		String _ret;
 		_ret = n.f0.accept(this, argu);
 		return _ret;
@@ -206,7 +240,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f4 -> ( MethodDeclaration() )*
 	* f5 -> "}"
 	*/
-	public String visit(ClassDeclaration n, Int argu){
+	public String visit(ClassDeclaration n, int argu){
 		String _ret = "FALSE";
 		String class_name;
 		Vector<String> list_of_var_ids = new Vector<String>();
@@ -225,7 +259,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 		class_name = n.f1.accept(this, argu);
 		Iterator _it = current_class_sym.iterator();
 		while(_it.hasNext()){
-			current_sym_table = _it.next();
+			current_sym_table = (Scope_Check)_it.next();
 			if(current_sym_table.class_name_id.equals(class_name)){
 				class_found = true;
 				break;
@@ -241,10 +275,10 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 		Iterator _itr = list_var_nodes.iterator();
 		VarDeclaration temp_var_dec;
 		while(_itr.hasNext()){
-			temp_var_dec = _itr.next();
+			temp_var_dec = (VarDeclaration)_itr.next();
 			list_of_var_ids.add(temp_var_dec.f1.f0.toString());
 		}
-		if(!Helper_Functions.check_distinct(list_of_var_ids)){
+		if(!help_me.check_distinct(list_of_var_ids)){
 			return _ret;
 		}
 		n.f4.accept(this, argu);
@@ -252,12 +286,12 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 		Iterator _itr2 = list_method_nodes.iterator();
 		MethodDeclaration temp_method_dec;
 		while(_itr2.hasNext()){
-			temp_method_dec = _itr2.next();
+			temp_method_dec = (MethodDeclaration)_itr2.next();
 			list_of_method_ids.add(temp_method_dec.f2.f0.toString());
 			list_of_method_ids.add(this.visit(temp_method_dec,1));
 		}
 		//Check for distinct method names and false value from the methods
-		if((!Helper_Functions.check_distinct(list_of_method_ids)) || (!Helper_Functions.check_success(list_of_method_ids))) {
+		if((!help_me.check_distinct(list_of_method_ids)) || (!help_me.check_success(list_of_method_ids))) {
 			return _ret;
 		}
 		n.f5.accept(this, argu);
@@ -276,7 +310,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f6 -> ( MethodDeclaration() )*
 	* f7 -> "}"
 	*/
-	public String visit(ClassExtendsDeclaration n, Int argu){
+	public String visit(ClassExtendsDeclaration n, int argu){
 		String _ret = "FALSE";
 
 		Vector<String> list_of_var_ids = new Vector<String>();
@@ -298,7 +332,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 		current_class_name = n.f1.accept(this, argu);
 		Iterator _it = current_class_sym.iterator();
 		while(_it.hasNext()){
-			current_sym_table = _it.next();
+			current_sym_table = (Scope_Check)_it.next();
 			if(current_sym_table.class_name_id.equals(current_class_name)){
 				class_found = true;
 				break;
@@ -320,10 +354,10 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 		Iterator _itr = list_var_nodes.iterator();
 		VarDeclaration temp_var_dec;
 		while(_itr.hasNext()){
-			temp_var_dec = _itr.next();
+			temp_var_dec = (VarDeclaration)_itr.next();
 			list_of_var_ids.add(temp_var_dec.f1.f0.toString());
 		}
-		if(!Helper_Functions.check_distinct(list_of_var_ids)){
+		if(!help_me.check_distinct(list_of_var_ids)){
 			return _ret;
 		}
 
@@ -335,15 +369,15 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 		MethodDeclaration temp_method;
 		while(_itr2.hasNext()){
 			String temp_method_name;
-			temp_method = _itr2.next();
-			temp_method_name = Helper_Functions.get_methodname(temp_method);
+			temp_method = (MethodDeclaration)_itr2.next();
+			temp_method_name = help_me.get_methodname(temp_method);
 			list_of_methods_ids.add(temp_method_name);
-			if(!Helper_Functions.noOverloading(current_class_name,extending_class_name,temp_method_name)){
+			if(!help_me.noOverloading(current_class_name,extending_class_name,temp_method_name)){
 				list_of_methods_ids.add("FALSE");
 			}
 			list_of_methods_ids.add(this.visit(temp_method,1));
 		}
-		if((!Helper_Functions.check_distinct(list_of_method_ids)) || (!Helper_Functions.check_success(list_of_methods_ids)))   {
+		if((!help_me.check_distinct(list_of_methods_ids)) || (!help_me.check_success(list_of_methods_ids)))   {
 			return _ret;
 		}
 
@@ -359,7 +393,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f1 -> Identifier()
 	* f2 -> ";"
 	*/
-	public String visit(VarDeclaration n, Int argu) {
+	public String visit(VarDeclaration n, int argu) {
 		String _ret = "FALSE";
 		boolean check_1 = false;
 		boolean check_2 = false;
@@ -384,7 +418,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f11 -> ";"
 	* f12 -> "}"
 	*/
-	public String visit(MethodDeclaration n, Int argu) {
+	public String visit(MethodDeclaration n, int argu) {
 
 		//Check for Formal Parameter List type. Distinct
 		//CHeck on distinct id's on var Declaration
@@ -413,18 +447,18 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 
 		//LOOP through the formal parameter nodes.
 		FormalParameterList temp_formal_parameter_list;
-		temp_formal_parameter_list = n.f4.node;
+		temp_formal_parameter_list = (FormalParameterList)n.f4.node;
 		list_formal_ids.add(temp_formal_parameter_list.f0.f1.f0.toString());
 		list_formal_nodes = temp_formal_parameter_list.f1.nodes;
 		Iterator _itr = list_formal_nodes.iterator();
 		FormalParameterRest temp_formal_parameter_rest;
 		while(_itr.hasNext()){
 			FormalParameter temp_formal_parameter_etc;
-			temp_formal_parameter_rest = _itr.next();
+			temp_formal_parameter_rest = (FormalParameterRest)_itr.next();
 			temp_formal_parameter_etc = temp_formal_parameter_rest.f1;
 			list_formal_ids.add(temp_formal_parameter_etc.f1.f0.toString());
 		}
-		if(!Helper_Functions.check_distinct(list_formal_ids)){
+		if(!help_me.check_distinct(list_formal_ids)){
 			return _ret;
 		}
 
@@ -437,10 +471,10 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 		_itr = list_var_nodes.iterator();
 		VarDeclaration temp_var_dec;
 		while(_itr.hasNext()){
-			temp_var_dec = _itr.next();
+			temp_var_dec = (VarDeclaration)_itr.next();
 			list_of_var_ids.add(temp_var_dec.f1.f0.toString());
 		}
-		if(!Helper_Functions.check_distinct(list_of_var_ids)){
+		if(!help_me.check_distinct(list_of_var_ids)){
 			return _ret;
 		}
 
@@ -451,10 +485,10 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 		_itr = list_statement_nodes.iterator();
 		Statement temp_statement;
 		while(_itr.hasNext()){
-			temp_statement = _itr.next();
+			temp_statement = (Statement)_itr.next();
 			list_statement_ids.add(this.visit(temp_statement,1));
 		}
-		if(!Helper_Functions.check_success(list_statement_ids)){
+		if(!help_me.check_success(list_statement_ids)){
 			return _ret;
 		}
 
@@ -480,7 +514,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f0 -> FormalParameter()
 	* f1 -> ( FormalParameterRest() )*
 	*/
-	public String visit(FormalParameterList n, Int argu) {
+	public String visit(FormalParameterList n, int argu) {
 		String _ret = "FALSE";
 		boolean check_first = false;
 		boolean check_second = false;
@@ -493,7 +527,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f0 -> Type()
 	* f1 -> Identifier()
 	*/
-	public String visit(FormalParameter n, Int argu) {
+	public String visit(FormalParameter n, int argu) {
 		String _ret = "FALSE";
 		boolean check_first = false;
 		boolean check_second = false;
@@ -507,7 +541,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f0 -> ","
 	* f1 -> FormalParameter()
 	*/
-	public String visit(FormalParameterRest n, Int argu) {
+	public String visit(FormalParameterRest n, int argu) {
 		String _ret = "FALSE";
 		boolean check_first = false;
 		n.f0.accept(this, argu);
@@ -521,7 +555,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	*       | IntegerType()
 	*       | Identifier()
 	*/
-	public String visit(Type n, Int argu) {
+	public String visit(Type n, int argu) {
 		String _ret = "FALSE";
 		boolean check_first = false;
 		n.f0.accept(this, argu);
@@ -534,7 +568,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f1 -> "["
 	* f2 -> "]"
 	*/
-	public String visit(ArrayType n, Int argu) {
+	public String visit(ArrayType n, int argu) {
 		String _ret = "FALSE";
 		boolean check_first = false;
 
@@ -549,7 +583,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	/**
 	* f0 -> "boolean"
 	*/
-	public String visit(BooleanType n, Int argu) {
+	public String visit(BooleanType n, int argu) {
 		String _ret = "FALSE";
 		boolean check_first = false;
 
@@ -561,7 +595,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	/**
 	* f0 -> "int"
 	*/
-	public String visit(IntegerType n, Int argu) {
+	public String visit(IntegerType n, int argu) {
 		String _ret = "FALSE";
 		boolean check_first = false;
 		n.f0.accept(this, argu);
@@ -577,11 +611,33 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	*       | WhileStatement()
 	*       | PrintStatement()
 	*/
-	public String visit(Statement n, Int argu) {
-		String _ret = "FALSE";
-		boolean check_first = false;
-
-		n.f0.accept(this, argu);
+	public String visit(Statement n, int argu) {
+		String _ret = "";
+		if(n.f0.which == 0){
+			Block temp_blk;
+			temp_blk = (Block)n.f0.choice;
+			_ret = this.visit(temp_blk,1);
+		}else if(n.f0.which == 1){
+			AssignmentStatement temp_assign;
+			temp_assign = (AssignmentStatement)n.f0.choice;
+			_ret = this.visit(temp_assign,1);
+		}else if(n.f0.which == 2){
+			ArrayAssignmentStatement temp_arry_assign;
+			temp_arry_assign = (ArrayAssignmentStatement)n.f0.choice;
+			_ret = this.visit(temp_arry_assign,1);
+		}else if(n.f0.which == 3){
+			IfStatement temp_if;
+			temp_if = (IfStatement)n.f0.choice;
+			_ret = this.visit(temp_if,1);
+		}else if(n.f0.which == 4){
+			WhileStatement temp_while;
+			temp_while = (WhileStatement)n.f0.choice;
+			_ret = this.visit(temp_while,1);
+		}else if(n.f0.which == 5){
+			PrintStatement temp_print;
+			temp_print = (PrintStatement)n.f0.choice;
+			_ret = this.visit(temp_print,1);
+		}
 		return _ret;
 	}
 
@@ -590,14 +646,18 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f1 -> ( Statement() )*
 	* f2 -> "}"
 	*/
-	public String visit(Block n, Int argu) {
-		String _ret = "FALSE";
-
-
-
-		n.f0.accept(this, argu);
-		_ret = n.f1.accept(this, argu);
-		n.f2.accept(this, argu);
+	public String visit(Block n, int argu) {
+		String _ret = "";
+		Vector<Node> temp_nodes;
+		temp_nodes = n.f1.nodes;
+		Iterator _itr = temp_nodes.iterator();
+		while(_itr.hasNext()){
+			Statement temp_statement = (Statement)_itr.next();
+			_ret = this.visit(temp_statement,1);
+			if(_ret.equals("FALSE")){
+				return _ret;
+			}
+		}
 
 		return _ret;
 	}
@@ -608,15 +668,16 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f2 -> Expression()
 	* f3 -> ";"
 	*/
-	public String visit(AssignmentStatement n, Int argu) {
+	public String visit(AssignmentStatement n, int argu) {
 		String _ret = "FALSE";
 
 		String temp_id;
 		String str_2;
 
-		temp_id = n.f0.accept(this, argu);
+		temp_id = n.f0.f0.toString();
 		n.f1.accept(this, argu);
-		str_2 = n.f2.accept(this, argu);
+
+		str_2 = this.visit(n.f2,1);
 		n.f3.accept(this, argu);
 
 		String temp_type = current_sym_table.fields(temp_id);
@@ -635,23 +696,23 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f5 -> Expression()
 	* f6 -> ";"
 	*/
-	public String visit(ArrayAssignmentStatement n, Int argu) {
+	public String visit(ArrayAssignmentStatement n, int argu) {
 		String _ret = "FALSE";
 
 		String string_1;
 		String string_2;
 		String string_3;
 
-		string_1 = n.f0.accept(this, argu);
+		string_1 = n.f0.f0.toString();
 		String temp_type = current_sym_table.fields(string_1);
 		n.f1.accept(this, argu);
-		string_2 = n.f2.accept(this, argu);
+		string_2 = this.visit(n.f2,1);
 		n.f3.accept(this, argu);
 		n.f4.accept(this, argu);
-		string_3 = n.f5.accept(this, argu);
+		string_3 = this.visit(n.f5,1);
 		n.f6.accept(this, argu);
 
-		if(string_1.equals("ARRAY") && string_2.equals("INT") && string_3.equals("INT")){
+		if(temp_type.equals("ARRAY") && string_2.equals("INT") && string_3.equals("INT")){
 			_ret = "TRUE";
 		}
 
@@ -667,21 +728,19 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f5 -> "else"
 	* f6 -> Statement()
 	*/
-	public String visit(IfStatement n, Int argu) {
+	public String visit(IfStatement n, int argu) {
 		String _ret = "FALSE";
 
 		String string_1;
 		String string_2;
 		String string_3;
 
-		n.f0.accept(this, argu);
-		n.f1.accept(this, argu);
 
-		string_1 = n.f2.accept(this, argu);
-		n.f3.accept(this, argu);
-		string_2 = n.f4.accept(this, argu);
-		n.f5.accept(this, argu);
-		string_3 = n.f6.accept(this, argu);
+		string_1 = this.visit(n.f2,1);
+
+		string_2 = this.visit(n.f4,1);
+
+		string_3 = this.visit(n.f6,1);
 
 		if(string_1.equals("BOOL") && string_2.equals("TRUE") && (string_3.equals("TRUE"))){
 			_ret = "TRUE";
@@ -697,16 +756,15 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f3 -> ")"
 	* f4 -> Statement()
 	*/
-	public String visit(WhileStatement n, Int argu) {
+	public String visit(WhileStatement n, int argu) {
 		String _ret = "FALSE";
 
 		String string_1;
 		String string_2;
-		n.f0.accept(this, argu);
-		n.f1.accept(this, argu);
-		string_1 = n.f2.accept(this, argu);
-		n.f3.accept(this, argu);
-		string_2 = n.f4.accept(this, argu);
+
+		string_1 = this.visit(n.f2,1);
+
+		string_2 = this.visit(n.f4,1);
 
 		if(string_1.equals("BOOL") && string_2.equals("TRUE")){
 			_ret = "TRUE";
@@ -723,17 +781,13 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f3 -> ")"
 	* f4 -> ";"
 	*/
-	public String visit(PrintStatement n, Int argu) {
+	public String visit(PrintStatement n, int argu) {
 		String _ret = "FALSE";
 
 		String string_1;
 
 
-		n.f0.accept(this, argu);
-		n.f1.accept(this, argu);
-		string_1 = n.f2.accept(this, argu);
-		n.f3.accept(this, argu);
-		n.f4.accept(this, argu);
+		string_1 = this.visit(n.f2,1);
 		if(string_1.equals("INT")){
 			_ret = "TRUE";
 		}
@@ -754,10 +808,36 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	*       | MessageSend()
 	*       | PrimaryExpression()
 	*/
-	public String visit(Expression n, Int argu) {
-		String _ret;
-
-		_ret = n.f0.accept(this, argu);
+	public String visit(Expression n, int argu) {
+		String _ret = "";
+		if(n.f0.which == 0){
+			AndExpression temp_and = (AndExpression)n.f0.choice;
+			_ret = this.visit(temp_and,1);
+		}else if(n.f0.which == 1){
+			CompareExpression temp_cmp = (CompareExpression)n.f0.choice;
+			_ret = this.visit(temp_cmp,1);
+		}else if(n.f0.which == 2){
+			PlusExpression temp_plus = (PlusExpression)n.f0.choice;
+			_ret = this.visit(temp_plus,1);
+		}else if(n.f0.which == 3){
+			MinusExpression temp_minus = (MinusExpression)n.f0.choice;
+			_ret = this.visit(temp_minus,1);
+		}else if(n.f0.which == 4){
+			TimesExpression temp_times = (TimesExpression)n.f0.choice;
+			_ret = this.visit(temp_times,1);
+		}else if(n.f0.which == 5){
+			ArrayLookup temp_array_look = (ArrayLookup)n.f0.choice;
+			_ret = this.visit(temp_array_look,1);
+		}else if(n.f0.which == 6){
+			ArrayLength temp_array_length = (ArrayLength)n.f0.choice;
+			_ret = this.visit(temp_array_length,1);
+		}else if(n.f0.which == 7){
+			MessageSend temp_msg = (MessageSend)n.f0.choice;
+			_ret = this.visit(temp_msg,1);
+		}else if(n.f0.which == 8){
+			PrimaryExpression temp_prim_exp = (PrimaryExpression)n.f0.choice;
+			_ret = this.visit(temp_prim_exp,1);
+		}
 
 		return _ret;
 	}
@@ -767,15 +847,15 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f1 -> "&&"
 	* f2 -> PrimaryExpression()
 	*/
-	public String visit(AndExpression n, Int argu) {
+	public String visit(AndExpression n, int argu) {
 		String _ret = "FALSE";
 		String check_1;
 		String check_2;
 
 		// RETURNS THE CHOICE NUMBER
-		check_1 = n.f0.accept(this, argu);
+		check_1 = this.visit(n.f0,1);
 		n.f1.accept(this, argu);
-		check_2 = n.f2.accept(this, argu);
+		check_2 = this.visit(n.f2,1);
 
 		if(check_1.equals("BOOL") && (check_2.equals("BOOL"))){
 			_ret = "BOOL";
@@ -791,15 +871,15 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f1 -> "<"
 	* f2 -> PrimaryExpression()
 	*/
-	public String visit(CompareExpression n, Int argu) {
+	public String visit(CompareExpression n, int argu) {
 		String _ret = "FALSE";
 
 		String check_1;
 		String check_2;
 
-		check_1 = n.f0.accept(this, argu);
+		check_1 = this.visit(n.f0,1);
 		n.f1.accept(this, argu);
-		check_2 = n.f2.accept(this, argu);
+		check_2 = this.visit(n.f2,1);
 
 		if(check_1.equals("INT") && (check_2.equals("INT"))){
 			_ret = "BOOL";
@@ -813,14 +893,14 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f1 -> "+"
 	* f2 -> PrimaryExpression()
 	*/
-	public String visit(PlusExpression n, Int argu) {
+	public String visit(PlusExpression n, int argu) {
 		String _ret = "FALSE";
 		String check_1;
 		String check_2;
 
-		check_1 = n.f0.accept(this, argu);
+		check_1 = this.visit(n.f0,1);
 		n.f1.accept(this, argu);
-		check_2 = n.f2.accept(this, argu);
+		check_2 = this.visit(n.f2,1);
 
 		if(check_1.equals("INT") && (check_2.equals("INT"))){
 			_ret = "INT";
@@ -835,15 +915,15 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f1 -> "-"
 	* f2 -> PrimaryExpression()
 	*/
-	public String visit(MinusExpression n, Int argu) {
+	public String visit(MinusExpression n, int argu) {
 		String _ret = "FALSE";
 
 		String check_1;
 		String check_2;
 
-		check_1 = n.f0.accept(this, argu);
+		check_1 = this.visit(n.f0,1);
 		n.f1.accept(this, argu);
-		check_2 = n.f2.accept(this, argu);
+		check_2 = this.visit(n.f2,1);
 
 		if(check_1.equals("INT") && (check_2.equals("INT"))){
 			_ret = "INT";
@@ -858,16 +938,16 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f1 -> "*"
 	* f2 -> PrimaryExpression()
 	*/
-	public String visit(TimesExpression n, Int argu) {
+	public String visit(TimesExpression n, int argu) {
 		String _ret = "FALSE";
 
 		String check_1;
 		String check_2;
 
 
-		check_1 = n.f0.accept(this, argu);
+		check_1 = this.visit(n.f0,1);
 		n.f1.accept(this, argu);
-		check_2 = n.f2.accept(this, argu);
+		check_2 = this.visit(n.f2,1);
 
 		if(check_1.equals("INT") && (check_2.equals("INT"))){
 			_ret = "INT";
@@ -882,15 +962,16 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f2 -> PrimaryExpression()
 	* f3 -> "]"
 	*/
-	public String visit(ArrayLookup n, Int argu) {
+	public String visit(ArrayLookup n, int argu) {
 		String _ret = "FALSE";
 
 		String check_1;
 		String check_2;
 
-		check_1 = n.f0.accept(this, argu);
+		check_1 = this.visit(n.f0,1);
 		n.f1.accept(this, argu);
-		check_2 = n.f2.accept(this, argu);
+		check_2 = this.visit(n.f2,1);
+
 		n.f3.accept(this, argu);
 
 		if(check_1.equals("ARRAY") && (check_2.equals("INT"))){
@@ -904,11 +985,11 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f1 -> "."
 	* f2 -> "length"
 	*/
-	public String visit(ArrayLength n, Int argu) {
+	public String visit(ArrayLength n, int argu) {
 		String _ret = "FALSE";
 
 		String check_1;
-		check_1 = n.f0.accept(this, argu);
+		check_1 = this.visit(n.f0,1);
 		n.f1.accept(this, argu);
 		n.f2.accept(this, argu);
 
@@ -925,17 +1006,32 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f3 -> "("
 	* f4 -> ( ExpressionList() )?
 	* f5 -> ")"
+	new Fac(). computeFac(10)
 	*/
-	public String visit(MessageSend n, Int argu) {
+	public String visit(MessageSend n, int argu) {
 		String _ret = "FALSE";
+		String method_return_type1 = "";
+		PrimaryExpression random_exp = n.f0;
 
+		String class_id_name = this.visit(random_exp,1); // Fac
 
+		temp_method_classname = class_id_name;
 		//check f4
-		n.f0.accept(this, argu);
-		n.f1.accept(this, argu);
-		n.f2.accept(this, argu);
-		n.f3.accept(this, argu);
-		_ret = n.f4.accept(this, argu);
+		current_method = n.f2.f0.toString();
+
+		ExpressionList random_exp_list = (ExpressionList)n.f4.node;
+		_ret = this.visit(random_exp_list,1);
+		if(_ret.equals("TRUE")){
+			Iterator _itr = current_class_sym.iterator();
+			while(_itr.hasNext()){
+				Scope_Check temp_scope_chk = (Scope_Check)_itr.next();
+				if(temp_scope_chk.class_name_id.equals(class_id_name)){
+					method_return_type1 = temp_scope_chk.return_method_type(current_method);
+
+					return method_return_type1;
+				}
+			}
+		}
 		n.f5.accept(this, argu);
 
 
@@ -946,18 +1042,40 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f0 -> Expression()
 	* f1 -> ( ExpressionRest() )*
 	*/
-	public String visit(ExpressionList n, Int argu) {
+	public String visit(ExpressionList n, int argu) {
 		String _ret = "FALSE";
+		Vector<String> random_exp_type = help_me.method_type(temp_method_classname,current_method);
 
-		String string_1;
-		String string_2;
-		string_1 = n.f0.accept(this, argu);
-		string_2 = n.f1.accept(this, argu);
+		Vector<String> match_parameter_type = new Vector<String>();
+		match_parameter_type.add(this.visit(n.f0,1));
 
-		if(string_1.equals(string_2)){
-			_ret = string_1;
+		Vector<Node> temp_nodes = n.f1.nodes;
+		if(temp_nodes.size() != 0){
+			Iterator _itr = temp_nodes.iterator();
+			while(_itr.hasNext()){
+				ExpressionRest temp_exp_rest = (ExpressionRest)_itr.next();
+				match_parameter_type.add(this.visit(temp_exp_rest,1));
+			}
+			System.out.println("I was here");
+			if(match_parameter_type.size() != random_exp_type.size()){
+				System.out.println("Vector Size too small");
+				return _ret;
+			}
+			for(int i = 0; i < random_exp_type.size(); i++){
+				if(random_exp_type.elementAt(i).equals(match_parameter_type.elementAt(i))) {
+					System.out.println("It did not match");
+					return _ret;
+				}
+			}
+		}else{
+			if(random_exp_type.elementAt(0).equals(match_parameter_type.elementAt(0))){
+				_ret = "TRUE";
+				return _ret;
+			}
 		}
 
+
+		_ret = "TRUE";
 		return _ret;
 	}
 
@@ -965,13 +1083,13 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f0 -> ","
 	* f1 -> Expression()
 	*/
-	public String visit(ExpressionRest n, Int argu) {
-		String _ret = "FALSE";
+	public String visit(ExpressionRest n, int argu) {
+		String return_type;
 
 		n.f0.accept(this, argu);
-		_ret = n.f1.accept(this, argu);
+		return_type = this.visit(n.f1,1);
 
-		return _ret;
+		return return_type;
 	}
 
 	/**
@@ -985,10 +1103,37 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	*       | NotExpression()
 	*       | BracketExpression()
 	*/
-	public String visit(PrimaryExpression n, Int argu) {
-		String _ret;
+	public String visit(PrimaryExpression n, int argu) {
+		String _ret = "";
+		if(n.f0.which == 0){
+			 IntegerLiteral tmp_int = (IntegerLiteral)n.f0.choice;
+			 return this.visit(tmp_int,1);
+		}else if(n.f0.which == 1){
+			 TrueLiteral tmp_true = (TrueLiteral)n.f0.choice;
+			 return this.visit(tmp_true,1);
+		}else if(n.f0.which == 2){
+			FalseLiteral tmp_false = (FalseLiteral)n.f0.choice;
+			return this.visit(tmp_false,1);
+		}else if(n.f0.which == 3){
+			Identifier tmp_id = (Identifier)n.f0.choice;
+			return this.visit(tmp_id,1);
+		}else if(n.f0.which == 4){
+			ThisExpression tmp_this = (ThisExpression)n.f0.choice;
+			return this.visit(tmp_this,1);
+		}else if(n.f0.which == 5){
+			ArrayAllocationExpression tmp_array_all = (ArrayAllocationExpression)n.f0.choice;
+			return this.visit(tmp_array_all,1);
+		}else if(n.f0.which == 6){
+			AllocationExpression tmp_allocate = (AllocationExpression)n.f0.choice;
+			return this.visit(tmp_allocate,1);
+		}else if(n.f0.which == 7){
+			NotExpression tmp_not = (NotExpression)n.f0.choice;
+			return this.visit(tmp_not,1);
+		}else if(n.f0.which == 8){
+			BracketExpression tmp_bracket = (BracketExpression)n.f0.choice;
+			return this.visit(tmp_bracket,1);
+		}
 
-		_ret = n.f0.accept(this, argu);
 
 		return _ret;
 	}
@@ -996,7 +1141,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	/**
 	* f0 -> <INTEGER_LITERAL>
 	*/
-	public String visit(IntegerLiteral n, Int argu) {
+	public String visit(IntegerLiteral n, int argu) {
 		String _ret = "INT";
 
 		n.f0.accept(this, argu);
@@ -1007,7 +1152,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	/**
 	* f0 -> "true"
 	*/
-	public String visit(TrueLiteral n, Int argu) {
+	public String visit(TrueLiteral n, int argu) {
 		String _ret = "BOOL";
 
 		n.f0.accept(this, argu);
@@ -1018,7 +1163,7 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	/**
 	* f0 -> "false"
 	*/
-	public String visit(FalseLiteral n, Int argu) {
+	public String visit(FalseLiteral n, int argu) {
 		String _ret = "BOOL";
 
 		n.f0.accept(this, argu);
@@ -1029,18 +1174,21 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	/**
 	* f0 -> <IDENTIFIER>
 	*/
-	public String visit(Identifier n, Int argu) {
-		String _ret = "ID";
+	public String visit(Identifier n, int argu) {
+		String _ret = "";
+		String str_1 = n.f0.toString();
 
-		n.f0.accept(this, argu);
+		if(current_sym_table.check_id(str_1)){
+			_ret = n.f0.toString();
+		}
 		return _ret;
 	}
 
 	/**
 	* f0 -> "this"
 	*/
-	public String visit(ThisExpression n, Int argu) {
-		String _ret = "ETC";
+	public String visit(ThisExpression n, int argu) {
+		String _ret = current_sym_table.class_name_id;
 
 		n.f0.accept(this, argu);
 
@@ -1054,15 +1202,11 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f3 -> Expression()
 	* f4 -> "]"
 	*/
-	public String visit(ArrayAllocationExpression n, Int argu) {
+	public String visit(ArrayAllocationExpression n, int argu) {
 
 		String _ret = "FALSE";
 		String str_1;
-
-		n.f0.accept(this, argu);
-		n.f1.accept(this, argu);
-		n.f2.accept(this, argu);
-		str_1 = n.f3.accept(this, argu);
+		str_1 = this.visit(n.f3,1);
 		n.f4.accept(this, argu);
 		if(str_1.equals("INT")){
 			_ret = "ARRAY";
@@ -1076,11 +1220,11 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f2 -> "("
 	* f3 -> ")"
 	*/
-	public String visit(AllocationExpression n, Int argu) {
+	public String visit(AllocationExpression n, int argu) {
 		String _ret = "ID";
 
 		n.f0.accept(this, argu);
-		n.f1.accept(this, argu);
+		_ret = n.f1.f0.toString();
 		n.f2.accept(this, argu);
 		n.f3.accept(this, argu);
 
@@ -1091,12 +1235,12 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f0 -> "!"
 	* f1 -> Expression()
 	*/
-	public String visit(NotExpression n, Int argu) {
+	public String visit(NotExpression n, int argu) {
 		String _ret = "FALSE";
 
 		String string_1;
 		n.f0.accept(this, argu);
-		string_1 = n.f1.accept(this, argu);
+		string_1 = this.visit(n.f1,1);
 		if(string_1.equals("BOOL")){
 			_ret = "BOOL";
 		}
@@ -1108,11 +1252,13 @@ class TypeCheck extends GJDepthFirst<String, Int>  {
 	* f1 -> Expression()
 	* f2 -> ")"
 	*/
-	public String visit(BracketExpression n, Int argu) {
+	public String visit(BracketExpression n, int argu) {
 		String _ret = "FALSE";
 		n.f0.accept(this, argu);
-		_ret = n.f1.accept(this, argu);
+
+		_ret = this.visit(n.f1,1);
 		n.f2.accept(this, argu);
+
 		return _ret;
 	}
 }

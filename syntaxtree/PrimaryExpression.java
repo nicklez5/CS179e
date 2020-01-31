@@ -23,7 +23,7 @@ public class PrimaryExpression implements Node {
 
    public PrimaryExpression(NodeChoice n0) {
       f0 = n0;
-      primaryexpression_choice = n0.whichChoice;
+      primaryexpression_choice = n0.which;
    }
 
    public void accept(visitor.Visitor v) {
@@ -36,7 +36,7 @@ public class PrimaryExpression implements Node {
      return v.visit(this,argu);
    }
    public <R> R accept(visitor.GJNoArguVisitor<R> v) {
-     return v.visit(this,argu);
+     return v.visit(this);
    }
    public <A> void accept(visitor.GJVoidVisitor<A> v, A argu) {
 

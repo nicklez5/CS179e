@@ -33,6 +33,7 @@ public class NodeSequence implements NodeListInterface {
    public <R,A> R accept(visitor.GJVisitor<R,A> v, A argu) {
       return v.visit(this,argu);
    }
+
    public <R> R accept(visitor.GJNoArguVisitor<R> v) {
       return v.visit(this);
    }
@@ -42,4 +43,3 @@ public class NodeSequence implements NodeListInterface {
 
    public Vector<Node> nodes;
 }
-
