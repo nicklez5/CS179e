@@ -38,7 +38,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 			MiniJavaParser xyz = new MiniJavaParser(System.in);
 			Depth_Type_Check sym_check = new Depth_Type_Check();
 			holy_goal = xyz.Goal();
-			//Missing an argument
+
 			holy_goal.accept(sym_check);
 
 			/*Printing all the data calculated from Depth_Type_Check
@@ -98,16 +98,23 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		Iterator temp_itr = temp_nodes.iterator();
 
 		while(temp_itr.hasNext()){
+			String type_declaration_type;
 			TypeDeclaration temp_type = (TypeDeclaration)temp_itr.next();
-			this.visit(temp_type,1);
-
+			type_declaration_type = this.visit(temp_type,1);
+			if(type_declaration_type.equals("FALSE")){
+				System.out.println("Type declaration failed");
+				return "FALSE";
+			}
 		}
 		//help_me.print_function(class_title);
 		n.f2.accept(this, argu);
+
 		if(!help_me.check_distinct(class_name_vec)){
+			System.out.println("Distinct class names failed");
 			return "FALSE";
 		}
 		if(!str_1.equals("TRUE")){
+			System.out.println("Main class failed");
 			return "FALSE";
 		}
 		return ret_1;
@@ -189,6 +196,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		//If all failed return fail
 		if(!temp_variables.isEmpty()){
 			if(!help_me.check_distinct(temp_variables)){
+				System.out.println("Distinct variable test failed");
 				return _ret;
 			}
 		}
@@ -260,7 +268,8 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 
 		boolean class_found = false;
 
-		class_name = n.f1.accept(this, argu);
+		class_name = n.f1.f0.toString();
+
 		Iterator _it = current_class_sym.iterator();
 		while(_it.hasNext()){
 			current_sym_table = (Scope_Check)_it.next();
@@ -270,6 +279,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 			}
 		}
 		if(!class_found){
+			System.out.println("List of table names test failed ");
 			_ret = "FALSE";
 			return _ret;
 		}
@@ -283,6 +293,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 			list_of_var_ids.add(temp_var_dec.f1.f0.toString());
 		}
 		if(!help_me.check_distinct(list_of_var_ids)){
+			System.out.println("Distinct variable test failed");
 			return _ret;
 		}
 		n.f4.accept(this, argu);
@@ -291,11 +302,15 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		MethodDeclaration temp_method_dec;
 		while(_itr2.hasNext()){
 			temp_method_dec = (MethodDeclaration)_itr2.next();
-			list_of_method_ids.add(temp_method_dec.f2.f0.toString());
-			list_of_method_ids.add(this.visit(temp_method_dec,1));
+			String tmp_mtd_name = temp_method_dec.f2.f0.toString();
+			System.out.println("Method_name:" + tmp_mtd_name);
+			list_of_method_ids.add(tmp_mtd_name);
+			String return_type_1 = this.visit(temp_method_dec,1);
+			list_of_method_ids.add(return_type_1);
 		}
 		//Check for distinct method names and false value from the methods
 		if((!help_me.check_distinct(list_of_method_ids)) || (!help_me.check_success(list_of_method_ids))) {
+			System.out.println("Failed distinct check on methods or success on Statements");
 			return _ret;
 		}
 		n.f5.accept(this, argu);
@@ -437,7 +452,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		Vector<String> list_formal_ids = new Vector<String>();
 		Vector<String> list_statement_ids = new Vector<String>();
 		Vector<String> list_of_var_ids = new Vector<String>();
-
+		Iterator _itr;
 		Vector<Node> list_formal_nodes;
 		Vector<Node> list_statement_nodes;
 		Vector<Node> list_var_nodes;
@@ -446,26 +461,29 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		//Check for the type - f1 and expression - f10
 		n.f0.accept(this, argu);
 		n.f1.accept(this, argu);
-		method_id = n.f2.accept(this, argu);
+		method_id = n.f2.f0.toString();
 		n.f3.accept(this, argu);
 		n.f4.accept(this, argu);
 
 		//LOOP through the formal parameter nodes.
 		FormalParameterList temp_formal_parameter_list;
-		temp_formal_parameter_list = (FormalParameterList)n.f4.node;
-		list_formal_ids.add(temp_formal_parameter_list.f0.f1.f0.toString());
-		list_formal_nodes = temp_formal_parameter_list.f1.nodes;
-		Iterator _itr = list_formal_nodes.iterator();
-		FormalParameterRest temp_formal_parameter_rest;
-		while(_itr.hasNext()){
-			FormalParameter temp_formal_parameter_etc;
-			temp_formal_parameter_rest = (FormalParameterRest)_itr.next();
-			temp_formal_parameter_etc = temp_formal_parameter_rest.f1;
-			list_formal_ids.add(temp_formal_parameter_etc.f1.f0.toString());
+		if(n.f4.node != null){
+			temp_formal_parameter_list = (FormalParameterList)n.f4.node;
+			list_formal_ids.add(temp_formal_parameter_list.f0.f1.f0.toString());
+			list_formal_nodes = temp_formal_parameter_list.f1.nodes;
+			_itr = list_formal_nodes.iterator();
+			FormalParameterRest temp_formal_parameter_rest;
+			while(_itr.hasNext()){
+				FormalParameter temp_formal_parameter_etc;
+				temp_formal_parameter_rest = (FormalParameterRest)_itr.next();
+				temp_formal_parameter_etc = temp_formal_parameter_rest.f1;
+				list_formal_ids.add(temp_formal_parameter_etc.f1.f0.toString());
+			}
+			if(!help_me.check_distinct(list_formal_ids)){
+				return _ret;
+			}
 		}
-		if(!help_me.check_distinct(list_formal_ids)){
-			return _ret;
-		}
+
 
 		n.f5.accept(this, argu);
 		n.f6.accept(this, argu);
@@ -494,6 +512,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 			list_statement_ids.add(this.visit(temp_statement,1));
 		}
 		if(!help_me.check_success(list_statement_ids)){
+			System.out.println("Statement test check failed");
 			return _ret;
 		}
 
@@ -503,8 +522,9 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		//Check for expression type and that it matches with the method.
 		Expression temp_expression;
 		temp_expression = n.f10;
-		String exp_type = this.visit(temp_expression,1);
-		String method_type = current_sym_table.fields(method_id);
+		String exp_type = current_sym_table.fields(this.visit(temp_expression,1));
+		String method_type = current_sym_table.method_fields(method_id);
+
 		if(!exp_type.equals(method_type)){
 			return _ret;
 		}
@@ -745,11 +765,11 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 
 
 		string_1 = this.visit(n.f2,1);
-
+		//System.out.println("Expression:" + string_1);
 		string_2 = this.visit(n.f4,1);
-
+		//System.out.println("Statement return type:" + string_2);
 		string_3 = this.visit(n.f6,1);
-
+		//System.out.println("Statement return type:" + string_3);
 		if(string_1.equals("BOOL") && string_2.equals("TRUE") && (string_3.equals("TRUE"))){
 			_ret = "TRUE";
 		}
@@ -796,7 +816,11 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 
 
 		string_1 = this.visit(n.f2,1);
-		if(string_1.equals("INT")){
+		if(help_me.check_if_no_type(string_1)){
+
+		}
+		System.out.println("Print value type:" + string_1);
+		if(string_1.equals("INT") || string_1.equals("TRUE")){
 			_ret = "TRUE";
 		}
 
@@ -886,10 +910,12 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		String check_2;
 
 		check_1 = this.visit(n.f0,1);
+
 		n.f1.accept(this, argu);
 		check_2 = this.visit(n.f2,1);
+		String left_id_type = current_sym_table.fields(check_1);
 
-		if(check_1.equals("INT") && (check_2.equals("INT"))){
+		if(left_id_type.equals("INT") && (check_2.equals("INT"))){
 			_ret = "BOOL";
 		}
 
@@ -907,9 +933,14 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		String check_2;
 
 		check_1 = this.visit(n.f0,1);
+		if(help_me.check_if_no_type(check_1)){
+			check_1 = current_sym_table.fields(check_1);
+		}
 		n.f1.accept(this, argu);
 		check_2 = this.visit(n.f2,1);
-
+		if(help_me.check_if_no_type(check_2)){
+			check_2 = current_sym_table.fields(check_2);
+		}
 		if(check_1.equals("INT") && (check_2.equals("INT"))){
 			_ret = "INT";
 		}
@@ -930,9 +961,14 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		String check_2;
 
 		check_1 = this.visit(n.f0,1);
+		if(help_me.check_if_no_type(check_1)){
+			check_1 = current_sym_table.fields(check_1);
+		}
 		n.f1.accept(this, argu);
 		check_2 = this.visit(n.f2,1);
-
+		if(help_me.check_if_no_type(check_2)){
+			check_2 = current_sym_table.fields(check_2);
+		}
 		if(check_1.equals("INT") && (check_2.equals("INT"))){
 			_ret = "INT";
 		}
@@ -954,10 +990,17 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 
 
 		check_1 = this.visit(n.f0,1);
+		if(help_me.check_if_no_type(check_1)){
+			check_1 = current_sym_table.fields(check_1);
+		}
 		n.f1.accept(this, argu);
 		check_2 = this.visit(n.f2,1);
+		if(help_me.check_if_no_type(check_2)){
+			check_2 = current_sym_table.fields(check_2);
+		}
 
 		if(check_1.equals("INT") && (check_2.equals("INT"))){
+
 			_ret = "INT";
 		}
 
@@ -1041,12 +1084,14 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 					}
 				}
 			}
+
 		}else{
 			Iterator _itr = current_class_sym.iterator();
 			while(_itr.hasNext()){
 				Scope_Check temp_scope_chk = (Scope_Check)_itr.next();
 				if(temp_scope_chk.class_name_id.equals(class_id_name)){
 					method_return_type1 = temp_scope_chk.return_method_type(current_method);
+					System.out.println("Method type:" + method_return_type1);
 					return method_return_type1;
 				}
 			}
@@ -1081,15 +1126,10 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 				System.out.println("Vector Size too small");
 				return _ret;
 			}
-			for(int i = 0; i < random_exp_type.size(); i++){
-				if(random_exp_type.elementAt(i).equals(match_parameter_type.elementAt(i))) {
-					System.out.println("It did not match");
-					return _ret;
-				}
-			}
-		}else{
-			if(random_exp_type.elementAt(0).equals(match_parameter_type.elementAt(0))){
-				_ret = "TRUE";
+		}
+		for(int i = 0; i < random_exp_type.size(); i++){
+			if(!random_exp_type.elementAt(i).equals(match_parameter_type.elementAt(i))) {
+				System.out.println("It did not match");
 				return _ret;
 			}
 		}

@@ -264,7 +264,9 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 */
 	public void visit(FormalParameter n) {
 		 this.visit(n.f0);
+		 String var_id = n.f1.f0.toString();
 		 sym_table.add_method(current_method_name, this.current_type);
+		 sym_table.add_me(var_id,this.current_type);
 	}
 
 	/**

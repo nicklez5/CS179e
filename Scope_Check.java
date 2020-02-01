@@ -22,6 +22,10 @@ public class Scope_Check{
       String str_1 = scope_map.get(id);
       return str_1;
     }
+    public String method_fields(String id){
+        String str_1 = method_return_type_map.get(id);
+        return str_1;
+    }
     public boolean check_id(String id){
       if(scope_map.containsKey(id)){
         return true;

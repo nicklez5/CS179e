@@ -26,6 +26,14 @@ public class Helper_Functions{
         return n0.f2.f0.toString();
     }
     public boolean check_success(Vector<String> statement_ID){
+        /*
+        Iterator _itr = statement_ID.iterator();
+        while(_itr.hasNext()){
+            String xyz = (String)_itr.next();
+            System.out.println(xyz);
+        }
+        */
+
         if(statement_ID.contains("FALSE")){
             return false;
         }
@@ -85,6 +93,12 @@ public class Helper_Functions{
             _ret = "ID";
         }
         return _ret;
+    }
+    public boolean check_if_no_type(String _id){
+        if(_id.equals("INT") || _id.equals("ARRAY") || _id.equals("BOOL") || _id.equals("ID") ){
+            return false;
+        }
+        return true;
     }
     public boolean check_class_id(String class_id){
         Iterator value = class_tables.iterator();
