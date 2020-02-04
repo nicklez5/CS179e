@@ -26,6 +26,11 @@ public class Helper_Functions{
         return n0.f2.f0.toString();
     }
     public boolean check_success(Vector<String> statement_ID){
+        Iterator itr = statement_ID.iterator();
+        while(itr.hasNext()){
+            String temp_value = (String)itr.next();
+            System.out.println(temp_value);
+        }
         /*
         Iterator _itr = statement_ID.iterator();
         while(_itr.hasNext()){
@@ -41,6 +46,7 @@ public class Helper_Functions{
     }
     public boolean check_distinct(Vector<String> List_ID){
         //Create a copy of the vector of nodes.
+
         Vector<String> temp_vec = new Vector<String>(List_ID);
 
         String temp_str;
@@ -60,6 +66,7 @@ public class Helper_Functions{
             return false;
         }
     }
+
     //Given that NodeListOptional in a Class Declaration. extract the type environment
     public Vector<String> method_type(String class_id, String method_name1){
         Vector<String> da_list = new Vector<String>();
@@ -68,14 +75,8 @@ public class Helper_Functions{
         while(_itr.hasNext()){
             temp_scope = (Scope_Check)_itr.next();
             if(temp_scope.class_name_id.equals(class_id)){
-                Map<String,String> da_method_map = temp_scope.method_scope_map;
-                for(Map.Entry<String,String> entry: da_method_map.entrySet()){
-                    String k = entry.getKey();
-                    String v = entry.getValue();
-                    if(k.equals(method_name1)){
-                        da_list.add(v);
-                    }
-                }
+                da_list = temp_scope.give_me_parameter(method_name1);
+                break;
             }
         }
 
@@ -123,16 +124,7 @@ public class Helper_Functions{
         return xyz;
 
     }
-    public String methodtype(String class_id, String method_name_id){
-        String empty_str = "";
-        Scope_Check temp_table = new Scope_Check();
-        temp_table = fields(class_id);
-        if(temp_table.check_id(method_name_id)){
-            return temp_table.fields(method_name_id);
-        }else{
-            return empty_str;
-        }
-    }
+
     public boolean noOverloading(String class_id, String class_super_id, String method_name_id){
         Vector<String> method_vec_super = new Vector<String>();
         Vector<String> method_vec = new Vector<String>();

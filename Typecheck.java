@@ -17,7 +17,11 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 	public Vector<String> class_name_vec;
 	public Typecheck(){
 		 current_method = "";
-
+		 temp_method_classname = "";
+		 current_class_sym = new Vector<Scope_Check>();
+		 help_me = new Helper_Functions();
+		 current_sym_table = new Scope_Check();
+		 class_name_vec = new Vector<String>();
 	}
 
 
@@ -41,6 +45,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 
 			holy_goal.accept(sym_check);
 
+
 			/*Printing all the data calculated from Depth_Type_Check
 			Iterator _itr = sym_check.class_sym.iterator();
 	        Scope_Check temp_table;
@@ -51,6 +56,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 			*/
 
 			Typecheck test_me = new Typecheck(sym_check);
+			test_me.print_all_of_me();
 			holy_goal.accept(test_me,1);
 
 			boolean_value_goal = test_me.visit(holy_goal,1);
@@ -77,6 +83,21 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 	f1 - (typedeclaration_choice) *
 	f2 - EOF
 	*/
+	public void print_all_of_me(){
+		Iterator table_itr = current_class_sym.iterator();
+		Scope_Check temp_table33;
+		while(table_itr.hasNext()){
+			temp_table33 = (Scope_Check)table_itr.next();
+			System.out.println("Table Name: " + temp_table33.class_name_id);
+			System.out.println("Printing of variables");
+			temp_table33.print_map();
+			System.out.println("Printing of method vector types");
+			temp_table33.print_method_vec();
+			System.out.println("Printing of method return types");
+			temp_table33.print_method_return_type();
+		}
+		System.out.println("End of print");
+	}
 	public String visit(Goal n, int argu){
 		String ret_1 = "TRUE";
 		String str_1 = "";
@@ -211,7 +232,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 			temp_statement_variables.add(this.visit(temp_statement,1));
 		}
 		if(!help_me.check_success(temp_statement_variables)){
-			System.out.println("I died here");
+			System.out.println("The Statements has failed");
 			return _ret;
 		}
 
@@ -303,7 +324,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		while(_itr2.hasNext()){
 			temp_method_dec = (MethodDeclaration)_itr2.next();
 			String tmp_mtd_name = temp_method_dec.f2.f0.toString();
-			System.out.println("Method_name:" + tmp_mtd_name);
+			//System.out.println("Method_name:" + tmp_mtd_name);
 			list_of_method_ids.add(tmp_mtd_name);
 			String return_type_1 = this.visit(temp_method_dec,1);
 			list_of_method_ids.add(return_type_1);
@@ -522,10 +543,12 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		//Check for expression type and that it matches with the method.
 		Expression temp_expression;
 		temp_expression = n.f10;
-		String exp_type = current_sym_table.fields(this.visit(temp_expression,1));
+		String exp_value = this.visit(temp_expression,1);
+		if(help_me.check_if_no_type(exp_value)){
+			exp_value = current_sym_table.fields(this.visit(temp_expression,1));
+		}
 		String method_type = current_sym_table.method_fields(method_id);
-
-		if(!exp_type.equals(method_type)){
+		if(!exp_value.equals(method_type)){
 			return _ret;
 		}
 		_ret = "TRUE";
@@ -819,7 +842,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		if(help_me.check_if_no_type(string_1)){
 
 		}
-		System.out.println("Print value type:" + string_1);
+		//System.out.println("Print value type:" + string_1);
 		if(string_1.equals("INT") || string_1.equals("TRUE")){
 			_ret = "TRUE";
 		}
@@ -933,6 +956,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		String check_2;
 
 		check_1 = this.visit(n.f0,1);
+		System.out.println("Check_1_value: " + check_1);
 		if(help_me.check_if_no_type(check_1)){
 			check_1 = current_sym_table.fields(check_1);
 		}
@@ -941,6 +965,8 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		if(help_me.check_if_no_type(check_2)){
 			check_2 = current_sym_table.fields(check_2);
 		}
+		System.out.println("Check_1_type: " + check_1);
+		System.out.println("Check_2_type: " + check_2);
 		if(check_1.equals("INT") && (check_2.equals("INT"))){
 			_ret = "INT";
 		}
@@ -1063,38 +1089,42 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		String _ret = "FALSE";
 		String method_return_type1 = "";
 		PrimaryExpression random_exp = n.f0;
-
-		String class_id_name = this.visit(random_exp,1); // Fac
-
-		temp_method_classname = class_id_name;
+		Vector<String> method_vec_return_type = new Vector<String>();
+		//String class_id_name = current_sym_table.fields(this.visit(random_exp,1)); // Fac
+		temp_method_classname = this.visit(random_exp,1);
+		System.out.println("Method Class Name: " + temp_method_classname);
+		//Could be BT() or root.
 		//check f4
 		current_method = n.f2.f0.toString();
+		System.out.println("Method Name: " + current_method);
+		Iterator class_itr = current_class_sym.iterator();
+		while(class_itr.hasNext()){
+			Scope_Check temp_table = (Scope_Check)class_itr.next();
+			//Check if the Scope Check class name is equivalent to expression ID aka BT
+			if(temp_table.class_name_id.equals(temp_method_classname)){
+				System.out.println(temp_table.class_name_id + " matched " + temp_method_classname);
+				method_return_type1 = temp_table.return_method_type(current_method);
+				break;
+			}else{
+				String class_key = temp_table.method_fields(current_method);
+				if(class_key != null){
+					System.out.println(class_key);
+					//temp_table.print_method_return_type();
+					method_return_type1 = temp_table.return_method_type(current_method);
+					System.out.println("Method return type: " + method_return_type1);
+					break;
+				}
+			}
+		}
 
 		if(n.f4.node != null){
 			ExpressionList random_exp_list = (ExpressionList)n.f4.node;
 			_ret = this.visit(random_exp_list,1);
 			if(_ret.equals("TRUE")){
-				Iterator _itr = current_class_sym.iterator();
-				while(_itr.hasNext()){
-					Scope_Check temp_scope_chk = (Scope_Check)_itr.next();
-					if(temp_scope_chk.class_name_id.equals(class_id_name)){
-						method_return_type1 = temp_scope_chk.return_method_type(current_method);
-
-						return method_return_type1;
-					}
-				}
+				_ret = method_return_type1;
 			}
-
 		}else{
-			Iterator _itr = current_class_sym.iterator();
-			while(_itr.hasNext()){
-				Scope_Check temp_scope_chk = (Scope_Check)_itr.next();
-				if(temp_scope_chk.class_name_id.equals(class_id_name)){
-					method_return_type1 = temp_scope_chk.return_method_type(current_method);
-					System.out.println("Method type:" + method_return_type1);
-					return method_return_type1;
-				}
-			}
+			_ret = method_return_type1;
 		}
 
 		n.f5.accept(this, argu);
@@ -1110,10 +1140,12 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 	public String visit(ExpressionList n, int argu) {
 		String _ret = "FALSE";
 		Vector<String> random_exp_type = help_me.method_type(temp_method_classname,current_method);
-
+		//System.out.println("Method Name: " + current_method);
 		Vector<String> match_parameter_type = new Vector<String>();
-		match_parameter_type.add(this.visit(n.f0,1));
+		String weird_string = this.visit(n.f0,1);
 
+		match_parameter_type.add(weird_string);
+		System.out.println("Weird ass String: " + weird_string);
 		Vector<Node> temp_nodes = n.f1.nodes;
 		if(temp_nodes.size() != 0){
 			Iterator _itr = temp_nodes.iterator();
@@ -1121,13 +1153,16 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 				ExpressionRest temp_exp_rest = (ExpressionRest)_itr.next();
 				match_parameter_type.add(this.visit(temp_exp_rest,1));
 			}
-			System.out.println("I was here");
+			//System.out.println("I was here");
 			if(match_parameter_type.size() != random_exp_type.size()){
 				System.out.println("Vector Size too small");
 				return _ret;
 			}
 		}
+
 		for(int i = 0; i < random_exp_type.size(); i++){
+			System.out.println("Random exp value: " + random_exp_type.elementAt(i));
+			System.out.println("Match exp value: " + match_parameter_type.elementAt(i));
 			if(!random_exp_type.elementAt(i).equals(match_parameter_type.elementAt(i))) {
 				System.out.println("It did not match");
 				return _ret;
@@ -1136,6 +1171,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 
 
 		_ret = "TRUE";
+		System.out.println("Matched successfully");
 		return _ret;
 	}
 
@@ -1241,6 +1277,7 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 		if(current_sym_table.check_id(str_1)){
 			_ret = n.f0.toString();
 		}
+
 		return _ret;
 	}
 

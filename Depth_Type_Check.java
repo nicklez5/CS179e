@@ -13,16 +13,18 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	public String current_method_name;
 	public Helper_Functions helper1;
 	public Vector<Scope_Check> class_sym;
+	public Vector<String> parameter_list_types;
 	public Depth_Type_Check(){
+		sym_table = new Scope_Check();
 		primary_exp_number = 0;
 		store_assign = false;
 		empty_id = "";
 		helper1 = new Helper_Functions();
 		class_sym = new Vector<Scope_Check>();
-		sym_table = new Scope_Check();
 		current_type = "";
 		current_method_name = "";
-		//this.helper1 = new Helper_Functions();
+		parameter_list_types = new Vector<String>();
+		//helper1 = new Helper_Functions();
 	}
 
 	/**
@@ -31,14 +33,13 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 			f2 - EOF
 		*/
 	public void visit(Goal n) {
-		 this.visit(n.f0);
+		 visit(n.f0);
 		 Vector<Node> temp_nodes = n.f1.nodes;
-
 		 Iterator _itr = temp_nodes.iterator();
 		 while(_itr.hasNext()){
 
 			 TypeDeclaration temp_declare = (TypeDeclaration)_itr.next();
-			 this.visit(temp_declare);
+			 visit(temp_declare);
 		 }
 		 n.f2.accept(this);
 
@@ -79,10 +80,9 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 String class_name;
 		 n.f0.accept(this);
 		 n.f1.accept(this);
-		 class_name = n.f1.id_value;
+		 class_name = n.f1.f0.toString();
 		 //System.out.println(class_name);
 		 sym_table.class_name_id =  class_name;
-		 class_sym.add(sym_table);
 		 n.f2.accept(this);
 		 n.f3.accept(this);
 		 n.f4.accept(this);
@@ -95,10 +95,22 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 n.f11.accept(this);
 		 n.f12.accept(this);
 		 n.f13.accept(this);
-		 n.f14.accept(this);
-		 n.f15.accept(this);
+		 Vector<Node> list_of_nodes = n.f14.nodes;
+		 Iterator _itr = list_of_nodes.iterator();
+		 while(_itr.hasNext()){
+			 VarDeclaration temp_variable = (VarDeclaration)_itr.next();
+			 visit(temp_variable);
+		 }
+		 list_of_nodes = n.f15.nodes;
+		 _itr = list_of_nodes.iterator();
+		 while(_itr.hasNext()){
+			 Statement temp_statement = (Statement)_itr.next();
+			 visit(temp_statement);
+		 }
+
 		 n.f16.accept(this);
 		 n.f17.accept(this);
+		 class_sym.add(sym_table);
 	}
 
 	/**
@@ -106,17 +118,16 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 *       | ClassExtendsDeclaration()
 	 */
 	public void visit(TypeDeclaration n) {
-		Scope_Check new_scope_check = new Scope_Check();
-		sym_table = new_scope_check;
+		sym_table = new Scope_Check();
 
 
 		if(n.f0.which == 0){
 			ClassDeclaration temp_class_declare = (ClassDeclaration)n.f0.choice;
-			this.visit(temp_class_declare);
+			visit(temp_class_declare);
 		}else{
 			ClassExtendsDeclaration temp_ext_class_declare;
 			temp_ext_class_declare = (ClassExtendsDeclaration)n.f0.choice;
-			this.visit(temp_ext_class_declare);
+			visit(temp_ext_class_declare);
 
 		}
 
@@ -132,21 +143,21 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f5 -> "}"
 	 */
 	public void visit(ClassDeclaration n) {
-		 sym_table.class_name_id = n.f1.id_value;
-
+		 sym_table.class_name_id = n.f1.f0.toString();
+		 //System.out.println("Current class name: " + n.f1.id_value);
 		 Vector<Node> temp_nodes;
 		 temp_nodes = n.f3.nodes;
 		 Iterator _itr = temp_nodes.iterator();
 		 while(_itr.hasNext()){
 			 VarDeclaration temp_var = (VarDeclaration)_itr.next();
-			 this.visit(temp_var);
+			 visit(temp_var);
 		 }
-		 //temp_nodes.clear();
-		 temp_nodes = n.f4.nodes;
-		 _itr = temp_nodes.iterator();
-		 while(_itr.hasNext()){
-			 MethodDeclaration temp_method = (MethodDeclaration)_itr.next();
-			 this.visit(temp_method);
+		 Vector<Node> temp_nodes2;
+		 temp_nodes2 = n.f4.nodes;
+		 Iterator _itr2 = temp_nodes2.iterator();
+		 while(_itr2.hasNext()){
+			 MethodDeclaration temp_method = (MethodDeclaration)_itr2.next();
+			 visit(temp_method);
 		 }
 		 class_sym.add(sym_table);
 
@@ -163,22 +174,21 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f7 -> "}"
 	 */
 	public void visit(ClassExtendsDeclaration n) {
-		 sym_table.class_name_id = n.f1.id_value;
+		 sym_table.class_name_id = n.f1.f0.toString();
 
 		Vector<Node> temp_nodes;
 		temp_nodes = n.f5.nodes;
 		Iterator _itr = temp_nodes.iterator();
 		while(_itr.hasNext()){
 			VarDeclaration temp_var = (VarDeclaration)_itr.next();
-			this.visit(temp_var);
+			visit(temp_var);
 		}
-
-		temp_nodes.clear();
-		temp_nodes = n.f6.nodes;
-		_itr = temp_nodes.iterator();
-		while(_itr.hasNext()){
-			MethodDeclaration temp_method = (MethodDeclaration)_itr.next();
-			this.visit(temp_method);
+		Vector<Node> temp_nodes2;
+		temp_nodes2 = n.f6.nodes;
+		Iterator _itr2 = temp_nodes2.iterator();
+		while(_itr2.hasNext()){
+			MethodDeclaration temp_method = (MethodDeclaration)_itr2.next();
+			visit(temp_method);
 		}
 		class_sym.add(sym_table);
 
@@ -191,11 +201,11 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 */
 	public void visit(VarDeclaration n) {
 		 String id_name;
-		 this.visit(n.f0);
+		 visit(n.f0);
 		 id_name = n.f1.f0.toString();
 
 		 //Check if a map contains this key
-		sym_table.add_me(id_name,this.current_type);
+		sym_table.add_me(id_name,current_type);
 
 		 n.f2.accept(this);
 	}
@@ -217,26 +227,44 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 */
 	public void visit(MethodDeclaration n) {
 		 n.f0.accept(this);
-		 this.visit(n.f1);
+		 visit(n.f1);
 		 String method_return_type = current_type;
 		 n.f2.accept(this);
 		 //System.out.println(n.f2.id_value);
-		 current_method_name = n.f2.id_value;
+		 current_method_name = n.f2.f0.toString();
+
+		 //Adding the method name with the method RETURN TYPE
 		 sym_table.add_method_type(current_method_name,method_return_type);
 		 if(n.f4.node != null){
+
 			 FormalParameterList temp_formal_parameter_list;
 			 temp_formal_parameter_list = (FormalParameterList)n.f4.node;
-			 this.visit(temp_formal_parameter_list);
+			 visit(temp_formal_parameter_list);
+
+			 //Adding the method parameter type.
+			 sym_table.add_paramethod(current_method_name,parameter_list_types);
 		 }
 
 
 		 n.f6.accept(this);
-		 n.f7.accept(this);
-		 n.f8.accept(this);
+		 Vector<Node> temp_node_list = n.f7.nodes;
+		 Iterator _itr = temp_node_list.iterator();
+		 while(_itr.hasNext()){
+			 VarDeclaration temp_var = (VarDeclaration)_itr.next();
+			 visit(temp_var);
+		 }
+		 Vector<Node> temp_node_list2;
+		 temp_node_list2 = n.f8.nodes;
+		 Iterator _itr2 = temp_node_list2.iterator();
+		 while(_itr2.hasNext()){
+			 Statement temp_statement = (Statement)_itr2.next();
+			 visit(temp_statement);
+		 }
 		 n.f9.accept(this);
 		 n.f10.accept(this);
 		 n.f11.accept(this);
 		 n.f12.accept(this);
+
 	}
 
 	/**
@@ -244,29 +272,32 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f1 -> ( FormalParameterRest() )*
 	 */
 	public void visit(FormalParameterList n) {
+		parameter_list_types = new Vector<String>();
+		 //parameter_list_types.clear();
 		 FormalParameter temp_formal = n.f0;
-		 this.visit(temp_formal);
+		 visit(temp_formal);
+
 
 		 Vector<Node> temp_nodes;
 		 temp_nodes = n.f1.nodes;
-
 		 Iterator _itr = temp_nodes.iterator();
 		 while(_itr.hasNext()){
 			 FormalParameterRest temp_formal_parameter_rest = (FormalParameterRest)_itr.next();
-			 this.visit(temp_formal_parameter_rest);
+			 visit(temp_formal_parameter_rest);
 		 }
 
 	}
 
-	/**
+	/**q
 	 * f0 -> Type()
 	 * f1 -> Identifier()
 	 */
 	public void visit(FormalParameter n) {
-		 this.visit(n.f0);
+		 visit(n.f0);
 		 String var_id = n.f1.f0.toString();
-		 sym_table.add_method(current_method_name, this.current_type);
-		 sym_table.add_me(var_id,this.current_type);
+		 sym_table.add_me(var_id, current_type);
+		 parameter_list_types.add(current_type);
+		 //sym_table.add_me(var_id,this.current_type);
 	}
 
 	/**
@@ -275,7 +306,7 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 */
 	public void visit(FormalParameterRest n) {
 		 n.f0.accept(this);
-		 this.visit(n.f1);
+		 visit(n.f1);
 	}
 
 	/**
@@ -285,14 +316,19 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 *       | Identifier()
 	 */
 	public void visit(Type n) {
+
 		 if(n.f0.which == 0){
-			 this.current_type = "ARRAY";
+			 ArrayType xyz = (ArrayType)n.f0.choice;
+			 visit(xyz);
 		 }else if(n.f0.which == 1){
-			 this.current_type = "BOOL";
+			 BooleanType xyz_1 = (BooleanType)n.f0.choice;
+			 visit(xyz_1);
 		 }else if(n.f0.which == 2){
-			 this.current_type = "INT";
+			 IntegerType xyz_2 = (IntegerType)n.f0.choice;
+			 visit(xyz_2);
 		 }else if(n.f0.which == 3){
-			 this.current_type = "ID";
+			 Identifier xyz_3 = (Identifier)n.f0.choice;
+			 visit(xyz_3);
 		 }
 	}
 
@@ -302,23 +338,24 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f2 -> "]"
 	 */
 	public void visit(ArrayType n) {
-		 n.f0.accept(this);
-		 n.f1.accept(this);
-		 n.f2.accept(this);
+		 current_type = "ARRAY";
+
 	}
 
 	/**
 	 * f0 -> "boolean"
 	 */
 	public void visit(BooleanType n) {
-		 n.f0.accept(this);
+		current_type = "BOOL";
+
 	}
 
 	/**
 	 * f0 -> "int"
 	 */
 	public void visit(IntegerType n) {
-		 n.f0.accept(this);
+		 current_type = "INT";
+
 	}
 
 	/**
@@ -333,27 +370,27 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		if(n.f0.which == 0){
 			Block temp_blk;
 			temp_blk = (Block)n.f0.choice;
-			this.visit(temp_blk);
+			visit(temp_blk);
 		}else if(n.f0.which == 1){
 			AssignmentStatement temp_assign;
 			temp_assign = (AssignmentStatement)n.f0.choice;
-			this.visit(temp_assign);
+			visit(temp_assign);
 		}else if(n.f0.which == 2){
 			ArrayAssignmentStatement temp_arry_assign;
 			temp_arry_assign = (ArrayAssignmentStatement)n.f0.choice;
-			this.visit(temp_arry_assign);
+			visit(temp_arry_assign);
 		}else if(n.f0.which == 3){
 			IfStatement temp_if;
 			temp_if = (IfStatement)n.f0.choice;
-			this.visit(temp_if);
+			visit(temp_if);
 		}else if(n.f0.which == 4){
 			WhileStatement temp_while;
 			temp_while = (WhileStatement)n.f0.choice;
-			this.visit(temp_while);
+			visit(temp_while);
 		}else if(n.f0.which == 5){
 			PrintStatement temp_print;
 			temp_print = (PrintStatement)n.f0.choice;
-			this.visit(temp_print);
+			visit(temp_print);
 		}
 
 	}
@@ -369,7 +406,7 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		Iterator _itr = temp_nodes.iterator();
 		while(_itr.hasNext()){
 			Statement temp_statement = (Statement)_itr.next();
-			this.visit(temp_statement);
+			visit(temp_statement);
 		}
 	}
 
@@ -381,9 +418,9 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 */
 	public void visit(AssignmentStatement n) {
 
-		 empty_id = n.f0.id_value;
+		 empty_id = n.f0.f0.toString();
 
-		 this.visit(n.f2);
+		 visit(n.f2);
 	}
 
 	/**
@@ -471,7 +508,7 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 		 if(n.f0.which == 8){
 			 	PrimaryExpression temp_prim_exp;
 				temp_prim_exp = (PrimaryExpression)n.f0.choice;
-				this.visit(temp_prim_exp);
+				visit(temp_prim_exp);
 		 }
 	}
 
@@ -621,7 +658,7 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 
 		if(n.f0.which == 6){
 			AllocationExpression temp_allocate = (AllocationExpression)n.f0.choice;
-			this.visit(temp_allocate);
+			visit(temp_allocate);
 		}
 	}
 
@@ -650,7 +687,8 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f0 -> <IDENTIFIER>
 	 */
 	public void visit(Identifier n) {
-		 n.f0.accept(this);
+		 current_type = n.f0.toString();
+		 //n.f0.accept(this);
 	}
 
 	/**
@@ -683,7 +721,7 @@ public class Depth_Type_Check extends DepthFirstVisitor  {
 	 * f3 -> ")"
 	 */
 	public void visit(AllocationExpression n) {
-		String xyz = n.f1.id_value;
+		String xyz = n.f1.f0.toString();
 		sym_table.add_me(empty_id,xyz);
 
 
