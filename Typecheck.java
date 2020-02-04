@@ -686,6 +686,10 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 			temp_print = (PrintStatement)n.f0.choice;
 			_ret = this.visit(temp_print,1);
 		}
+		if(_ret.equals("FALSE")){
+			int xyz = n.f0.which;
+			System.out.println("Statement no: " + xyz + " has failed.");
+		}
 		return _ret;
 	}
 
@@ -718,22 +722,32 @@ public class Typecheck extends GJDepthFirst<String,Integer>{
 	*/
 	public String visit(AssignmentStatement n, int argu) {
 		String _ret = "FALSE";
+		String id_1 = "";
+		String id_2 = "";
 
-		String temp_id;
+
 		String str_2;
-
-		temp_id = n.f0.f0.toString();
-		if(!current_sym_table.check_id(temp_id)){
+		String temp_id2_type = "";
+		id_1 = n.f0.f0.toString();
+		if(!current_sym_table.check_id(id_1)){
 			return _ret;
 		}
+		if(help_me.check_if_no_type(id_1)){
+			id_1 = current_sym_table.fields(id_1);
+		}
+
 		n.f1.accept(this, argu);
+		id_2 = this.visit(n.f2,1);
 
-		str_2 = this.visit(n.f2,1);
-		n.f3.accept(this, argu);
+		if(!current_sym_table.check_id(id_2)){
+			 return _ret;
+		}
+	
 
-		String temp_type = current_sym_table.fields(temp_id);
-		if(temp_type.equals(str_2)){
+		if(id_1.equals(id_2)){
 			_ret = "TRUE";
+		}else{
+			System.out.println(id_1 + " = " + id_2 + " has failed.");
 		}
 		return _ret;
 	}

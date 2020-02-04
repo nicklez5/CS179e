@@ -40,6 +40,7 @@ public class Helper_Functions{
         */
 
         if(statement_ID.contains("FALSE")){
+            System.out.println("HOLY SHIT I FUCKED UP");
             return false;
         }
         return true;
@@ -62,7 +63,9 @@ public class Helper_Functions{
         }
         if(temp_vec.size() == 0){
             return true;
+
         }else{
+
             return false;
         }
     }
@@ -96,10 +99,10 @@ public class Helper_Functions{
         return _ret;
     }
     public boolean check_if_no_type(String _id){
-        if(_id.equals("INT") || _id.equals("ARRAY") || _id.equals("BOOL") || _id.equals("ID") ){
-            return false;
+        if(!_id.equals("INT") && !_id.equals("ARRAY") && !_id.equals("BOOL")  ){
+            return true;
         }
-        return true;
+        return false;
     }
     public boolean check_class_id(String class_id){
         Iterator value = class_tables.iterator();
